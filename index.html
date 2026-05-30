@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textile ERP v2</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#1a365d;--secondary:#2c5282;--accent:#ed8936;--success:#38a169;--danger:#e53e3e;--bg:#f7fafc;--card:#fff;--text:#2d3748;--border:#e2e8f0;--pretreat:#4299e1;--dyeing:#9f7aea;--finish:#48bb78}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+nav{background:var(--primary);color:#fff;padding:0.75rem 1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.nav-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.logo{font-size:1.25rem;font-weight:bold;letter-spacing:-0.5px;white-space:nowrap}
+.nav-processes{display:flex;gap:0.35rem;flex-wrap:wrap;overflow-x:auto}
+.nav-processes button,.nav-pages button{background:transparent;border:1px solid rgba(255,255,255,0.25);color:#fff;padding:0.4rem 0.7rem;border-radius:5px;cursor:pointer;font-size:0.8rem;transition:all 0.2s;white-space:nowrap}
+.nav-processes button:hover,.nav-processes button.active,.nav-pages button:hover,.nav-pages button.active{background:#fff;color:var(--primary);font-weight:600}
+.nav-pages{display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(255,255,255,0.15)}
+.container{max-width:1500px;margin:0 auto;padding:1.5rem}
+
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--card);border-radius:10px;padding:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.08);cursor:pointer;transition:all 0.2s;border-left:4px solid var(--secondary)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.12)}
+.stat-card h3{color:#718096;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem}
+.stat-card .value{font-size:1.75rem;font-weight:bold;color:var(--primary)}
+.stat-card .sub{color:#a0aec0;font-size:0.8rem}
+.stat-card.total{border-left-color:var(--accent)}
+.stat-card.pretreat{border-left-color:var(--pretreat)}
+.stat-card.dyeing{border-left-color:var(--dyeing)}
+.stat-card.finish{border-left-color:var(--finish)}
+
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem}
+.section-header h2{font-size:1.35rem;color:var(--primary)}
+.btn{padding:0.5rem 1rem;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.4rem}
+.btn-primary{background:var(--secondary);color:#fff}
+.btn-primary:hover{background:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#2f855a}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c53030}
+.btn-warning{background:var(--accent);color:#fff}
+.btn-warning:hover{background:#dd6b20}
+.btn-secondary{background:#edf2f7;color:var(--text)}
+.btn-sm{padding:0.3rem 0.6rem;font-size:0.75rem}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+
+.table-container{background:var(--card);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.08);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{background:#f8fafc;padding:0.75rem 0.75rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#718096;font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:0.75rem;border-bottom:1px solid var(--border);font-size:0.8rem;vertical-align:top}
+tr:hover{background:#f8fafc}
+.badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:600;white-space:nowrap}
+.badge-brushing{background:#bee3f8;color:#2c5282}
+.badge-singeing_desizing{background:#fefcbf;color:#744210}
+.badge-cbr{background:#e9d8fd;color:#553c9a}
+.badge-mercerising{background:#c6f6d5;color:#22543d}
+.badge-pad_dry{background:#fed7d7;color:#742a2a}
+.badge-pad_steam{background:#feebc8;color:#7c2d12}
+.badge-cpb{background:#e2e8f0;color:#1a202c}
+.badge-stenter_dyed{background:#b2f5ea;color:#234e52}
+.badge-stenter_rfd{background:#c3dafe;color:#3c366b}
+.badge-washing{background:#d1fae5;color:#065f46}
+.badge-sanforiser{background:#fce7f3;color:#702459}
+.badge-printing{background:#e0e7ff;color:#3730a3}
+.badge-loop_steamer{background:#fef3c7;color:#78350f}
+.badge-split{background:#fed7d7;color:#742a2a}
+.badge-merged{background:#e9d8fd;color:#553c9a}
+.actions{display:flex;gap:0.4rem;flex-wrap:wrap}
+
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;justify-content:center;align-items:center;padding:1rem;overflow-y:auto}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:10px;width:100%;max-width:750px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)}
+.modal.wide{max-width:1000px}
+.modal-header{padding:1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:1.15rem;color:var(--primary)}
+.modal-close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:#a0aec0}
+.modal-body{padding:1.25rem}
+.modal-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.6rem;background:#f8fafc;border-radius:0 0 10px 10px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.875rem}
+.form-group{display:flex;flex-direction:column;gap:0.3rem}
+.form-group.full{grid-column:1/-1}
+label{font-size:0.8rem;font-weight:600;color:#4a5568}
+input,select,textarea{padding:0.5rem;border:1px solid var(--border);border-radius:5px;font-size:0.8rem;font-family:inherit;transition:border 0.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--secondary);box-shadow:0 0 0 3px rgba(66,153,225,0.1)}
+.hint{font-size:0.7rem;color:#a0aec0}
+.required::after{content:" *";color:var(--danger)}
+
+.split-piece{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:0.75rem}
+.split-piece-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;font-weight:600;color:var(--primary);flex-wrap:wrap;gap:0.5rem}
+.checkbox-group{display:flex;align-items:center;gap:0.4rem}
+.checkbox-group input[type="checkbox"]{width:1.1rem;height:1.1rem;cursor:pointer}
+
+.empty-state{text-align:center;padding:2.5rem;color:#a0aec0}
+.source-selector{background:#f8fafc;border:2px dashed var(--border);border-radius:8px;padding:1.25rem;text-align:center;margin-bottom:0.75rem;cursor:pointer;transition:all 0.2s}
+.source-selector:hover{border-color:var(--secondary);background:#ebf8ff}
+.source-selector.selected{border-style:solid;border-color:var(--success);background:#f0fff4}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:0.875rem 1.25rem;border-radius:8px;color:#fff;font-weight:600;z-index:300;transform:translateY(120px);transition:transform 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.toast.show{transform:translateY(0)}
+.toast-success{background:var(--success)}
+.toast-error{background:var(--danger)}
+
+.loading{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none !important}
+
+.merge-row{background:#fffbeb !important}
+.merge-checkbox{width:1.2rem;height:1.2rem;cursor:pointer}
+
+.filter-bar{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1rem;align-items:end}
+.filter-bar .form-group{margin:0}
+.filter-bar input,.filter-bar select{min-width:140px}
+
+.history-timeline{position:relative;padding-left:1.5rem}
+.history-timeline::before{content:"";position:absolute;left:0.5rem;top:0;bottom:0;width:2px;background:var(--border)}
+.history-item{position:relative;margin-bottom:1rem;padding:1rem;background:#fff;border-radius:8px;border:1px solid var(--border)}
+.history-item::before{content:"";position:absolute;left:-1.25rem;top:1.25rem;width:10px;height:10px;border-radius:50%;background:var(--secondary);border:2px solid #fff}
+.history-item .process-label{font-weight:bold;color:var(--primary);font-size:0.9rem}
+.history-item .date{color:#718096;font-size:0.8rem;margin-bottom:0.5rem}
+
+.settings-table th,.settings-table td{padding:0.6rem}
+.history-card{background:#fff;border-radius:12px;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:hidden}
+.history-header{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:#fff;padding:1.25rem 1.5rem}
+.history-header h3{font-size:1.25rem;margin-bottom:0.25rem}
+.history-meta{display:flex;gap:1.5rem;margin-top:0.75rem;flex-wrap:wrap;font-size:0.8rem;opacity:0.9}
+.history-body{padding:1.5rem;position:relative}
+.history-line{position:absolute;left:0.75rem;top:1.5rem;bottom:1.5rem;width:2px;background:linear-gradient(to bottom,var(--border),var(--secondary))}
+.history-step{position:relative;margin-bottom:1.25rem;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid var(--border);margin-left:1.5rem}
+.history-step::before{content:"";position:absolute;left:-1.5rem;top:1.25rem;width:12px;height:12px;border-radius:50%;background:var(--secondary);border:2px solid #fff;box-shadow:0 0 0 2px rgba(44,82,130,0.25)}
+.history-step.current::before{background:var(--success);box-shadow:0 0 0 2px rgba(56,161,105,0.25)}
+.history-step-header{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem}
+.history-step-status{margin-left:0.5rem;font-size:0.75rem;color:#718096;font-weight:600}
+.history-step-date{font-size:0.8rem;color:#718096;font-weight:600}
+.history-step-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem;font-size:0.8rem;color:#4a5568}
+
+@media(max-width:768px){
+.form-grid{grid-template-columns:1fr}
+.dashboard-grid{grid-template-columns:1fr}
+.nav-processes button{font-size:0.7rem;padding:0.3rem 0.5rem}
+.container{padding:0.75rem}
+table{min-width:700px}
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<nav>
+<div class="nav-top">
+<div class="logo">🏭 Textile ERP</div>
+<div class="nav-processes">
+<button onclick="showSection('dashboard')" class="active" id="nav-dashboard">Dashboard</button>
+<button onclick="showSection('brushing')" id="nav-brushing">Brushing</button>
+<button onclick="showSection('singeing_desizing')" id="nav-singeing">Singeing</button>
+<button onclick="showSection('cbr')" id="nav-cbr">CBR</button>
+<button onclick="showSection('mercerising')" id="nav-mercerising">Mercerising</button>
+<button onclick="showSection('pad_dry')" id="nav-pad_dry">Pad Dry</button>
+<button onclick="showSection('pad_steam')" id="nav-pad_steam">Pad Steam</button>
+<button onclick="showSection('cpb')" id="nav-cpb">CPB</button>
+<button onclick="showSection('stenter_dyed')" id="nav-stenter_dyed">Stenter (Dyed)</button>
+<button onclick="showSection('stenter_rfd')" id="nav-stenter_rfd">Stenter (RFD)</button>
+<button onclick="showSection('washing')" id="nav-washing">Washing</button>
+<button onclick="showSection('sanforiser')" id="nav-sanforiser">Sanforiser</button>
+<button onclick="showSection('printing')" id="nav-printing">Printing</button>
+<button onclick="showSection('loop_steamer')" id="nav-loop_steamer">Loop Steamer</button>
+</div>
+</div>
+<div class="nav-pages">
+<button onclick="showSection('activities')" id="nav-activities">📋 Recent Activities</button>
+<button onclick="showSection('history')" id="nav-history">🔍 Fabric History</button>
+<button onclick="showSection('settings')" id="nav-settings">⚙️ Settings</button>
+</div>
+</nav>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<section id="dashboard-section">
+<div class="section-header"><h2>Process Dashboard</h2><button class="btn btn-primary" onclick="refreshDashboard()">🔄 Refresh</button></div>
+<div class="dashboard-grid" id="dashboard-cards"></div>
+</section>
+
+<!-- PROCESS SECTION (Generic for all processes) -->
+<section id="process-section" class="hidden">
+<div class="section-header">
+<h2 id="process-title">Process</h2>
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+<button class="btn btn-success" onclick="openAddModal()">➕ Add New</button>
+<button class="btn btn-primary" onclick="openReceiveModal()">📥 Receive</button>
+<button class="btn btn-warning" id="merge-toggle-btn" onclick="toggleMergeMode()">🔗 Combine</button>
+<button class="btn btn-secondary hidden" id="merge-confirm-btn" onclick="openMergeModal()">✓ Combine Selected</button>
+<button class="btn btn-danger hidden" id="merge-cancel-btn" onclick="toggleMergeMode()">✕ Cancel</button>
+</div>
+</div>
+<div class="table-container"><table><thead id="process-thead"></thead><tbody id="process-table"></tbody></table></div>
+</section>
+
+<!-- RECENT ACTIVITIES -->
+<section id="activities-section" class="hidden">
+<div class="section-header"><h2>Recent Activities</h2></div>
+<div class="filter-bar">
+<div class="form-group"><label>Search</label><input type="text" id="act-search" placeholder="Batch, IB, Quality, Lot..." oninput="loadActivities()"></div>
+<div class="form-group"><label>Process</label><select id="act-process" onchange="loadActivities()"><option value="">All</option></select></div>
+<div class="form-group"><label>Status</label><select id="act-status" onchange="loadActivities()"><option value="">All</option><option value="in_stock">In Stock</option><option value="moved">Moved</option><option value="split">Split</option><option value="merged">Merged</option></select></div>
+<div class="form-group"><label>From Date</label><input type="date" id="act-from" onchange="loadActivities()"></div>
+<div class="form-group"><label>To Date</label><input type="date" id="act-to" onchange="loadActivities()"></div>
+<button class="btn btn-secondary" onclick="clearActivityFilters()">Clear</button>
+</div>
+<div class="table-container"><table><thead><tr><th>Date</th><th>Process</th><th>Quality</th><th>Grade</th><th>Batch #</th><th>IB #</th><th>Lot #</th><th>Shade</th><th>Meters</th><th>Status</th><th>Actions</th></tr></thead><tbody id="activities-table"></tbody></table></div>
+</section>
+
+<!-- FABRIC HISTORY -->
+<section id="history-section" class="hidden">
+<div class="section-header"><h2>Fabric History</h2></div>
+<div class="filter-bar" style="background:#fff;padding:1rem;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+<div class="form-group"><label>Batch Number</label><input type="text" id="hist-batch" placeholder="e.g. A424"></div>
+<div class="form-group"><label>IB Number</label><input type="text" id="hist-ib" placeholder="e.g. IB-4502"></div>
+<div class="form-group"><label>Lot Number</label><input type="text" id="hist-lot" placeholder="e.g. LOT-001"></div>
+<button class="btn btn-primary" onclick="searchHistory()" style="margin-bottom:0.15rem">🔍 Search</button>
+<button class="btn btn-secondary" onclick="clearHistory()" style="margin-bottom:0.15rem">Clear</button>
+</div>
+<div id="history-results" style="margin-top:1.5rem;"></div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings-section" class="hidden">
+<div class="section-header"><h2>Settings - Dropdown Management</h2></div>
+<div class="form-group" style="max-width:400px;margin-bottom:1rem;">
+<label>Select Category</label>
+<select id="settings-category" onchange="loadSettings()"></select>
+</div>
+<div class="table-container">
+<table class="settings-table">
+<thead><tr><th>Value</th><th>Label</th><th>Order</th><th>Active</th><th>Actions</th></tr></thead>
+<tbody id="settings-table"></tbody>
+</table>
+</div>
+<div style="background:#fff;padding:1.25rem;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-top:1.5rem;">
+<h3 style="margin-bottom:1rem;color:var(--primary);font-size:1.1rem;">Add New Option</h3>
+<div class="form-grid">
+<div class="form-group"><label class="required">Value (code)</label><input type="text" id="set-value" placeholder="e.g. all_in_1"></div>
+<div class="form-group"><label class="required">Label (display)</label><input type="text" id="set-label" placeholder="e.g. All in 1"></div>
+<div class="form-group"><label>Sort Order</label><input type="number" id="set-order" value="0"></div>
+<div class="form-group"><label>Active</label><select id="set-active"><option value="true">Yes</option><option value="false">No</option></select></div>
+<div class="form-group full"><button class="btn btn-success" onclick="saveSetting()">➕ Add Option</button></div>
+</div>
+</div>
+</section>
+
+</div>
+
+<!-- ADD NEW MODAL -->
+<div class="modal-overlay" id="modal-add"><div class="modal">
+<div class="modal-header"><h3 id="add-modal-title">Add New</h3><button class="modal-close" onclick="closeModal('modal-add')">&times;</button></div>
+<div class="modal-body"><div class="form-grid" id="add-form-grid"></div></div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('modal-add')">Cancel</button>
+<button class="btn btn-success" onclick="saveNewBatch()" id="btn-save-new">Save</button>
+</div>
+</div></div>
+
+<!-- RECEIVE/MOVE MODAL -->
+<div class="modal-overlay" id="modal-receive"><div class="modal">
+<div class="modal-header"><h3>Receive Fabric from Another Process</h3><button class="modal-close" onclick="closeModal('modal-receive')">&times;</button></div>
+<div class="modal-body">
+<p style="margin-bottom:1rem;color:#718096;">Select source process:</p>
+<div id="source-process-buttons" style="display:grid;gap:0.75rem;"></div>
+<div id="source-fabric-list" class="hidden" style="margin-top:1.5rem;">
+<h4 style="margin-bottom:0.75rem;color:var(--primary);">Select Fabric:</h4>
+<div class="table-container"><table><thead><tr><th>Select</th><th>Quality</th><th>Grade</th><th>Batch</th><th>IB</th><th>Meters</th><th>Date</th></tr></thead><tbody id="source-fabric-table"></tbody></table></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('modal-receive')">Cancel</button>
+<button class="btn btn-primary hidden" id="btn-confirm-source" onclick="confirmSourceSelection()">Next →</button>
+</div>
+</div></div>
+
+<!-- SPLIT & MOVE MODAL -->
+<div class="modal-overlay" id="modal-split"><div class="modal wide">
+<div class="modal-header"><h3>Move / Split Fabric</h3><button class="modal-close" onclick="closeModal('modal-split')">&times;</button></div>
+<div class="modal-body">
+<div style="background:#ebf8ff;border-left:4px solid var(--secondary);padding:1rem;margin-bottom:1rem;border-radius:4px;"><strong>Source:</strong> <span id="split-source-info"></span></div>
+<div class="form-group" style="margin-bottom:1rem;">
+<label>Split into how many pieces? (1-3)</label>
+<select id="split-count" onchange="renderSplitPieces()"><option value="1">1 piece (Move all)</option><option value="2">2 pieces</option><option value="3">3 pieces</option></select>
+</div>
+<div id="split-pieces-container"></div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('modal-split')">Cancel</button>
+<button class="btn btn-success" onclick="saveSplitMove()" id="btn-save-split">Save & Move</button>
+</div>
+</div></div>
+
+<!-- MERGE MODAL -->
+<div class="modal-overlay" id="modal-merge"><div class="modal">
+<div class="modal-header"><h3>Combine Fabrics into One</h3><button class="modal-close" onclick="closeModal('modal-merge')">&times;</button></div>
+<div class="modal-body">
+<div style="background:#fffbeb;border-left:4px solid var(--accent);padding:1rem;margin-bottom:1rem;border-radius:4px;">
+<strong>Combining <span id="merge-count"></span> pieces</strong><br>
+<span id="merge-source-info" style="font-size:0.85rem;color:#718096;"></span>
+</div>
+<div class="form-grid">
+<div class="form-group"><label class="required">Combined Meters (auto-sum, editable)</label><input type="number" id="merge-meters" step="0.01"></div>
+<div class="form-group"><label class="required">Process Date</label><input type="date" id="merge-date"></div>
+<div class="form-group"><label>Quality</label><input type="text" id="merge-quality"></div>
+<div class="form-group"><label>Grade</label><input type="text" id="merge-grade"></div>
+<div class="form-group full"><label>All Batch Numbers (read-only)</label><input type="text" id="merge-all-batches" readonly style="background:#f8fafc;"></div>
+<div class="form-group full"><label>All IB Numbers (read-only)</label><input type="text" id="merge-all-ibs" readonly style="background:#f8fafc;"></div>
+<div class="form-group full" id="merge-config-container"></div>
+<div class="form-group full"><label>Remarks (Optional)</label><textarea id="merge-remarks" rows="2"></textarea></div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('modal-merge')">Cancel</button>
+<button class="btn btn-success" onclick="saveMerge()" id="btn-save-merge">Combine & Save</button>
+</div>
+</div></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modal-edit"><div class="modal">
+<div class="modal-header"><h3>Edit Entry</h3><button class="modal-close" onclick="closeModal('modal-edit')">&times;</button></div>
+<div class="modal-body"><input type="hidden" id="edit-id"><div class="form-grid" id="edit-form-grid"></div></div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal('modal-edit')">Cancel</button>
+<button class="btn btn-success" onclick="saveEdit()" id="btn-save-edit">Save Changes</button>
+</div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// SUPABASE CONFIG
+// ============================================
+const SUPABASE_URL = 'https://oarguzyidraycxicqhef.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hcmd1enlpZHJheWN4aWNxaGVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzQsImV4cCI6MjA5NTQyNzUzNH0.xmmoE0KBRlrBXWqCpzGtXDSVqvILj30aXMrNgQIRO4c';
+const database = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================
+// APP CONFIG
+// ============================================
+const PROCESS_NAMES = {
+    'brushing':'Brushing','singeing_desizing':'Singeing & Desizing','cbr':'CBR','mercerising':'Mercerising',
+    'pad_dry':'Pad Dry','pad_steam':'Pad Steam','cpb':'CPB (Cold Pad Batch)',
+    'stenter_dyed':'Stenter (Dyed)','stenter_rfd':'Stenter (RFD)',
+    'washing':'Washing Range','sanforiser':'Sanforiser','printing':'Printing (Zimmer)','loop_steamer':'Loop Steamer'
+};
+
+const PROCESS_ORDER = ['brushing','singeing_desizing','cbr','mercerising','pad_dry','pad_steam','cpb','stenter_dyed','stenter_rfd','washing','sanforiser','printing','loop_steamer'];
+
+const PROCESS_CATEGORIES = {
+    'brushing':'pretreatment','singeing_desizing':'pretreatment','cbr':'pretreatment','mercerising':'pretreatment',
+    'pad_dry':'dyeing','pad_steam':'dyeing','cpb':'dyeing',
+    'stenter_dyed':'finishing','stenter_rfd':'finishing','washing':'finishing','sanforiser':'finishing','printing':'finishing','loop_steamer':'finishing'
+};
+
+const PROCESS_CONFIG = {
+    'brushing':{label:'Brushing',hasRfd:false,hasLot:false,hasShade:false,hasDesign:false,hasProcessType:false,hasProcessName:false},
+    'singeing_desizing':{label:'Singeing & Desizing',hasRfd:false,hasLot:false,hasShade:false,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'cbr':{label:'CBR',hasRfd:true,hasLot:false,hasShade:false,hasDesign:false,hasProcessType:false,hasProcessName:true},
+    'mercerising':{label:'Mercerising',hasRfd:true,hasLot:false,hasShade:false,hasDesign:false,hasProcessType:false,hasProcessName:false},
+    'pad_dry':{label:'Pad Dry',hasRfd:false,hasLot:true,hasShade:true,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'pad_steam':{label:'Pad Steam',hasRfd:false,hasLot:true,hasShade:true,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'cpb':{label:'CPB',hasRfd:false,hasLot:true,hasShade:true,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'stenter_dyed':{label:'Stenter (Dyed)',hasRfd:false,hasLot:true,hasShade:true,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'stenter_rfd':{label:'Stenter (RFD)',hasRfd:true,hasLot:false,hasShade:false,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'washing':{label:'Washing Range',hasRfd:false,hasLot:true,hasShade:true,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'sanforiser':{label:'Sanforiser',hasRfd:false,hasLot:true,hasShade:true,hasDesign:false,hasProcessType:true,hasProcessName:false},
+    'printing':{label:'Printing (Zimmer)',hasRfd:false,hasLot:true,hasShade:true,hasDesign:true,hasProcessType:true,hasProcessName:false},
+    'loop_steamer':{label:'Loop Steamer',hasRfd:false,hasLot:true,hasShade:true,hasDesign:true,hasProcessType:true,hasProcessName:false}
+};
+
+const DROPDOWN_CATEGORIES = {
+    'singeing_desizing':'singeing_type','pad_dry':'pad_dry_process','pad_steam':'pad_steam_process',
+    'cpb':'cpb_process','stenter_dyed':'stenter_process','stenter_rfd':'stenter_process',
+    'washing':'washing_process','sanforiser':'sanforiser_process','printing':'printing_process','loop_steamer':'loop_steamer_process'
+};
+
+let currentProcess = 'brushing';
+let selectedSourcePiece = null;
+let splitTargetProcess = null;
+let mergeMode = false;
+let mergeSelections = [];
+let dropdownCache = {};
+let allActivities = [];
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    populateActivityProcessFilter();
+    populateSettingsCategories();
+    refreshDashboard();
+});
+
+function populateActivityProcessFilter() {
+    const sel = document.getElementById('act-process');
+    PROCESS_ORDER.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = PROCESS_NAMES[p];
+        sel.appendChild(opt);
+    });
+}
+
+function populateSettingsCategories() {
+    const cats = [...new Set(Object.values(DROPDOWN_CATEGORIES)), 'grade'];
+    const sel = document.getElementById('settings-category');
+    sel.innerHTML = '<option value="">-- Select Category --</option>';
+    cats.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
+        sel.appendChild(opt);
+    });
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+function showSection(section) {
+    document.querySelectorAll('.nav-processes button, .nav-pages button').forEach(b => b.classList.remove('active'));
+    const navId = section==='singeing_desizing'?'singeing':section;
+    const btn = document.getElementById('nav-'+navId);
+    if(btn) btn.classList.add('active');
+
+    ['dashboard-section','process-section','activities-section','history-section','settings-section'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+
+    if(section==='dashboard'){
+        document.getElementById('dashboard-section').classList.remove('hidden');
+        refreshDashboard();
+    }else if(section==='activities'){
+        document.getElementById('activities-section').classList.remove('hidden');
+        loadActivities();
+    }else if(section==='history'){
+        document.getElementById('history-section').classList.remove('hidden');
+    }else if(section==='settings'){
+        document.getElementById('settings-section').classList.remove('hidden');
+        loadSettings();
+    }else{
+        currentProcess = section;
+        document.getElementById('process-section').classList.remove('hidden');
+        document.getElementById('process-title').textContent = PROCESS_NAMES[section]+' Stock';
+        loadProcessStock(section);
+    }
+}
+
+// ============================================
+// DASHBOARD
+// ============================================
+async function refreshDashboard() {
+    try {
+        const {data:summary,error:e1} = await database.from('stock_summary').select('*');
+        if(e1) throw e1;
+
+        const container = document.getElementById('dashboard-cards');
+        container.innerHTML = '';
+
+        let totalPieces = 0, totalMeters = 0;
+        const catTotals = {pretreatment:0,dyeing:0,finishing:0};
+
+        PROCESS_ORDER.forEach(proc => {
+            const item = summary ? summary.find(s=>s.current_process===proc) : null;
+            const count = item ? item.piece_count : 0;
+            const meters = item ? item.total_meters : 0;
+            totalPieces += count; totalMeters += meters;
+            const cat = PROCESS_CATEGORIES[proc];
+            if(cat) catTotals[cat] += meters;
+
+            const card = document.createElement('div');
+            card.className = 'stat-card '+PROCESS_CATEGORIES[proc];
+            card.onclick = ()=>showSection(proc);
+            card.innerHTML = `<h3>${PROCESS_NAMES[proc]}</h3><div class="value">${Number(meters||0).toLocaleString()} m</div><div class="sub">${count||0} piece${(count||0)!==1?'s':''}</div>`;
+            container.appendChild(card);
+        });
+
+        // Total Stock Card (insert at top)
+        const totalCard = document.createElement('div');
+        totalCard.className = 'stat-card total';
+        totalCard.style = 'grid-column:1/-1;';
+        totalCard.innerHTML = `<h3>Total Stock (All Processes)</h3><div class="value">${Number(totalMeters).toLocaleString()} m</div><div class="sub">${totalPieces} total pieces | Pretreatment: ${Number(catTotals.pretreatment).toLocaleString()}m | Dyeing: ${Number(catTotals.dyeing).toLocaleString()}m | Finishing: ${Number(catTotals.finishing).toLocaleString()}m</div>`;
+        container.insertBefore(totalCard, container.firstChild);
+
+    } catch(err) {
+        showToast('Dashboard error: '+err.message,'error');
+        console.error(err);
+    }
+}
+
+// ============================================
+// PROCESS STOCK TABLE
+// ============================================
+async function loadProcessStock(process) {
+    try {
+        const {data,error} = await database.from('fabric_pieces').select('*').eq('current_process',process).eq('status','in_stock').order('created_at',{ascending:false});
+        if(error) throw error;
+
+        const cfg = PROCESS_CONFIG[process];
+        const thead = document.getElementById('process-thead');
+        let headers = '<tr><th>Date</th><th>Quality</th><th>Grade</th>';
+        if(cfg.hasLot) headers += '<th>Lot #</th>';
+        if(cfg.hasShade) headers += '<th>Shade #</th><th>Shade Name</th>';
+        if(cfg.hasDesign) headers += '<th>Design #</th><th>Colour Way</th>';
+        headers += '<th>Batch #</th><th>IB #</th><th>Meters</th>';
+        if(cfg.hasRfd) headers += '<th>RFD</th>';
+        headers += '<th>Details</th><th>Remarks</th><th>Info</th><th>Actions</th></tr>';
+        thead.innerHTML = headers;
+
+        const tbody = document.getElementById('process-table');
+        tbody.innerHTML = '';
+
+        if(!data || data.length===0){
+            const colspan = 10 + (cfg.hasLot?1:0) + (cfg.hasShade?2:0) + (cfg.hasDesign?2:0) + (cfg.hasRfd?1:0);
+            tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty-state">No stock. Add new or receive from another process.</td></tr>`;
+            return;
+        }
+
+        data.forEach(row => {
+            let html = `<td>${formatDate(row.process_date)}</td><td>${row.quality}</td><td>${row.grade}</td>`;
+            if(cfg.hasLot) html += `<td>${row.lot_number||'-'}</td>`;
+            if(cfg.hasShade) html += `<td>${row.shade_number||'-'}</td><td>${row.shade_name||'-'}</td>`;
+            if(cfg.hasDesign) html += `<td>${row.design_number||'-'}</td><td>${row.colour_way||'-'}</td>`;
+
+            const batchDisplay = row.all_batch_numbers || row.batch_number;
+            const ibDisplay = row.all_ib_numbers || row.ib_number;
+            html += `<td>${batchDisplay}</td><td>${ibDisplay}</td><td><strong>${row.meters}m</strong></td>`;
+
+            if(cfg.hasRfd) html += `<td>${row.is_rfd?'✅ Yes':'❌ No'}</td>`;
+            html += `<td>${getProcessDetailDisplay(row)}</td><td>${row.remarks||'-'}</td>`;
+
+            let info = '-';
+            if(row.status==='split') info = `<span class="badge badge-split">Split ${row.split_index}/${row.split_total}</span>`;
+            else if(row.status==='merged') info = `<span class="badge badge-merged">Merged</span>`;
+            else if(row.merge_sources && row.merge_sources.length>0) info = `<span class="badge badge-merged">Combined</span>`;
+            html += `<td>${info}</td>`;
+
+            html += `<td class="actions">`;
+            if(mergeMode){
+                html += `<input type="checkbox" class="merge-checkbox" data-id="${row.id}" onchange="toggleMergeSelection('${row.id}')">`;
+            }else{
+                html += `<button class="btn btn-sm btn-primary" onclick='openEditModal("${row.id}")'>✏️ Edit</button>`;
+                html += `<button class="btn btn-sm btn-warning" onclick='initiateMove("${row.id}")'>📤 Move</button>`;
+                html += `<button class="btn btn-sm btn-danger" onclick='deleteEntry("${row.id}")'>🗑️ Delete</button>`;
+            }
+            html += `</td>`;
+
+            const tr = document.createElement('tr');
+            if(mergeMode) tr.className = 'merge-row';
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        });
+
+    } catch(err) {
+        showToast('Error loading stock: '+err.message,'error');
+        console.error(err);
+    }
+}
+
+function getProcessDetailDisplay(row) {
+    const cfg = PROCESS_CONFIG[row.current_process];
+    let details = [];
+    if(cfg && cfg.hasProcessType && row.process_config && row.process_config.process_type) {
+        const label = row.process_config.process_type.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
+        details.push(label);
+    }
+    if(cfg && cfg.hasProcessName && row.process_config && row.process_config.process_name) {
+        details.push(row.process_config.process_name);
+    }
+    if(cfg && cfg.hasRfd && row.is_rfd) details.push('RFD');
+    return details.length ? details.join(', ') : '-';
+}
+
+// ============================================
+// FORM FIELD RENDERING
+// ============================================
+function buildFormFields(mode, process, values) {
+    const cfg = PROCESS_CONFIG[process];
+    const v = values || {};
+    let html = '';
+
+    // Core fields
+    html += `<div class="form-group"><label class="required">Quality</label><input type="text" id="${mode}-quality" value="${v.quality||''}" placeholder="e.g. 40/1 Cotton"></div>`;
+    html += `<div class="form-group"><label class="required">Grade</label><select id="${mode}-grade"><option value="">Loading...</option></select></div>`;
+    html += `<div class="form-group"><label class="required">Batch Number</label><input type="text" id="${mode}-batch" value="${v.batch_number||''}" placeholder="e.g. B2024001"></div>`;
+    html += `<div class="form-group"><label class="required">IB Number</label><input type="text" id="${mode}-ib" value="${v.ib_number||''}" placeholder="e.g. IB-4502"></div>`;
+    html += `<div class="form-group"><label class="required">Meters</label><input type="number" id="${mode}-meters" value="${v.meters||''}" step="0.01" placeholder="e.g. 3000"></div>`;
+    html += `<div class="form-group"><label class="required">Process Date</label><input type="date" id="${mode}-date" value="${v.process_date||new Date().toISOString().split('T')[0]}"></div>`;
+
+    // Process-specific fields
+    if(cfg.hasLot) {
+        html += `<div class="form-group"><label>Lot Number</label><input type="text" id="${mode}-lot" value="${v.lot_number||''}" placeholder="e.g. LOT-2026-001"></div>`;
+    }
+    if(cfg.hasShade) {
+        html += `<div class="form-group"><label>Shade Number</label><input type="text" id="${mode}-shade_num" value="${v.shade_number||''}" placeholder="e.g. SH-001"></div>`;
+        html += `<div class="form-group"><label>Shade Name</label><input type="text" id="${mode}-shade_name" value="${v.shade_name||''}" placeholder="e.g. Navy Blue"></div>`;
+    }
+    if(cfg.hasDesign) {
+        html += `<div class="form-group"><label>Design Number</label><input type="text" id="${mode}-design" value="${v.design_number||''}" placeholder="e.g. D-4521"></div>`;
+        html += `<div class="form-group"><label>Colour Way</label><input type="text" id="${mode}-colour" value="${v.colour_way||''}" placeholder="e.g. CW-A"></div>`;
+    }
+    if(cfg.hasRfd) {
+        const checked = v.is_rfd ? 'checked' : '';
+        html += `<div class="form-group full"><label class="checkbox-group"><input type="checkbox" id="${mode}-rfd" ${checked}> <span style="font-weight:600;">This fabric is RFD (Ready for Dyeing)</span></label></div>`;
+    }
+
+    // Process type dropdown (async loaded)
+    if(cfg.hasProcessType) {
+        html += `<div class="form-group full" id="${mode}-process-type-container"><label class="required">Process Type</label><select id="${mode}-process-type"><option value="">Loading...</option></select></div>`;
+    }
+    if(cfg.hasProcessName) {
+        const pname = (v.process_config && v.process_config.process_name) ? v.process_config.process_name : '';
+        html += `<div class="form-group full"><label class="required">Process Name</label><input type="text" id="${mode}-process-name" value="${pname}" placeholder="e.g. CBR Treatment A"></div>`;
+    }
+
+    html += `<div class="form-group full"><label>Remarks (Optional)</label><textarea id="${mode}-remarks" rows="2" placeholder="Any notes...">${v.remarks||''}</textarea></div>`;
+
+    return html;
+}
+
+async function populateProcessTypeDropdown(mode, process, selectedValue) {
+    const cat = DROPDOWN_CATEGORIES[process];
+    if(!cat) return;
+    const container = document.getElementById(mode+'-process-type-container');
+    if(!container) return;
+
+    try {
+        const opts = await getDropdownOptions(cat);
+        let html = `<label class="required">Process Type</label><select id="${mode}-process-type"><option value="">-- Select --</option>`;
+        opts.forEach(o => {
+            html += `<option value="${o.value}" ${o.value===selectedValue?'selected':''}>${o.label}</option>`;
+        });
+        html += '</select>';
+        container.innerHTML = html;
+    } catch(e) {
+        container.innerHTML = `<label class="required">Process Type</label><select id="${mode}-process-type"><option value="">Error loading</option></select>`;
+    }
+}
+
+async function getDropdownOptions(category) {
+    if(dropdownCache[category]) return dropdownCache[category];
+    const {data,error} = await database.from('dropdown_options').select('*').eq('category',category).eq('is_active',true).order('sort_order');
+    if(error) throw error;
+    dropdownCache[category] = data || [];
+    return dropdownCache[category];
+}
+
+async function populateGradeDropdown(selectId, selectedValue) {
+    try {
+        const opts = await getDropdownOptions('grade');
+        const sel = document.getElementById(selectId);
+        if(!sel) return;
+        let html = `<option value="">-- Select Grade --</option>`;
+        opts.forEach(o => {
+            html += `<option value="${o.value}" ${o.value===selectedValue?'selected':''}>${o.label}</option>`;
+        });
+        sel.innerHTML = html;
+    } catch(e) {
+        const sel = document.getElementById(selectId);
+        if(sel) sel.innerHTML = '<option value="">Error loading</option>';
+    }
+}
+
+// ============================================
+// ADD NEW BATCH
+// ============================================
+function openAddModal() {
+    document.getElementById('add-modal-title').textContent = 'Add New to '+PROCESS_NAMES[currentProcess];
+    document.getElementById('add-form-grid').innerHTML = buildFormFields('new', currentProcess);
+    populateProcessTypeDropdown('new', currentProcess);
+    populateGradeDropdown('new-grade');
+    document.getElementById('modal-add').classList.add('active');
+}
+
+async function saveNewBatch() {
+    const btn = document.getElementById('btn-save-new');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+
+    try {
+        const payload = collectFormData('new', currentProcess);
+        if(!payload) throw new Error('Please fill all required fields');
+
+        const {error} = await database.from('fabric_pieces').insert([payload]);
+        if(error) throw error;
+
+        showToast('Saved successfully!','success');
+        closeModal('modal-add');
+        loadProcessStock(currentProcess);
+        refreshDashboard();
+    } catch(err) {
+        showToast(err.message,'error');
+        console.error(err);
+    } finally {
+        btn.innerHTML = 'Save'; btn.disabled = false;
+    }
+}
+
+function collectFormData(mode, process) {
+    const cfg = PROCESS_CONFIG[process];
+    const quality = document.getElementById(mode+'-quality').value.trim();
+    const grade = document.getElementById(mode+'-grade').value.trim();
+    const batch = document.getElementById(mode+'-batch').value.trim();
+    const ib = document.getElementById(mode+'-ib').value.trim();
+    const meters = parseFloat(document.getElementById(mode+'-meters').value);
+    const date = document.getElementById(mode+'-date').value;
+    const remarks = document.getElementById(mode+'-remarks').value.trim();
+
+    if(!quality || !grade || !batch || !ib || !meters || !date) return null;
+
+    let payload = {
+        quality, grade, batch_number:batch, ib_number:ib, meters,
+        original_meters: meters,
+        process_date: date, remarks,
+        current_process: process, status: 'in_stock'
+    };
+
+    if(cfg.hasLot) payload.lot_number = document.getElementById(mode+'-lot').value.trim() || null;
+    if(cfg.hasShade) {
+        payload.shade_number = document.getElementById(mode+'-shade_num').value.trim() || null;
+        payload.shade_name = document.getElementById(mode+'-shade_name').value.trim() || null;
+    }
+    if(cfg.hasDesign) {
+        payload.design_number = document.getElementById(mode+'-design').value.trim() || null;
+        payload.colour_way = document.getElementById(mode+'-colour').value.trim() || null;
+    }
+    if(cfg.hasRfd) payload.is_rfd = document.getElementById(mode+'-rfd').checked;
+
+    let pconfig = {};
+    if(cfg.hasProcessType) {
+        const pt = document.getElementById(mode+'-process-type');
+        if(!pt || !pt.value) return null;
+        pconfig.process_type = pt.value;
+    }
+    if(cfg.hasProcessName) {
+        const pn = document.getElementById(mode+'-process-name');
+        if(!pn || !pn.value.trim()) return null;
+        pconfig.process_name = pn.value.trim();
+    }
+    payload.process_config = pconfig;
+
+    return payload;
+}
+
+// ============================================
+// RECEIVE FROM ANY PROCESS
+// ============================================
+function openReceiveModal() {
+    selectedSourcePiece = null;
+    document.getElementById('source-process-buttons').innerHTML = '';
+    document.getElementById('source-fabric-list').classList.add('hidden');
+    document.getElementById('btn-confirm-source').classList.add('hidden');
+
+    PROCESS_ORDER.forEach(proc => {
+        if(proc === currentProcess) return;
+        const btn = document.createElement('button');
+        btn.className = 'source-selector';
+        btn.innerHTML = `<div style="font-size:1.15rem;font-weight:bold;color:var(--primary);margin-bottom:0.2rem;">${PROCESS_NAMES[proc]}</div><div style="font-size:0.8rem;color:#718096;">Click to view stock</div>`;
+        btn.onclick = () => selectSourceProcess(proc, btn);
+        document.getElementById('source-process-buttons').appendChild(btn);
+    });
+
+    document.getElementById('modal-receive').classList.add('active');
+}
+
+function selectSourceProcess(process, btnElement) {
+    document.querySelectorAll('.source-selector').forEach(b => {b.classList.remove('selected');b.style.borderStyle='dashed';});
+    btnElement.classList.add('selected'); btnElement.style.borderStyle='solid';
+    loadSourceFabric(process);
+}
+
+async function loadSourceFabric(process) {
+    try {
+        const {data,error} = await database.from('fabric_pieces').select('*').eq('current_process',process).eq('status','in_stock').order('created_at',{ascending:false});
+        if(error) throw error;
+
+        const list = document.getElementById('source-fabric-list');
+        const tbody = document.getElementById('source-fabric-table');
+        tbody.innerHTML = '';
+
+        if(!data || data.length===0){
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#a0aec0;">No stock available</td></tr>';
+            list.classList.remove('hidden'); return;
+        }
+
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.style.cursor = 'pointer';
+            tr.innerHTML = `<td><input type="radio" name="source-fabric" value="${row.id}" onchange="selectFabricPiece('${row.id}')"></td><td>${row.quality}</td><td>${row.grade}</td><td>${row.all_batch_numbers||row.batch_number}</td><td>${row.all_ib_numbers||row.ib_number}</td><td><strong>${row.meters}m</strong></td><td>${formatDate(row.process_date)}</td>`;
+            tr.onclick = () => { tr.querySelector('input').checked = true; selectFabricPiece(row.id); };
+            tbody.appendChild(tr);
+        });
+        list.classList.remove('hidden');
+    } catch(err) { showToast('Error: '+err.message,'error'); }
+}
+
+function selectFabricPiece(id) {
+    selectedSourcePiece = id;
+    document.getElementById('btn-confirm-source').classList.remove('hidden');
+}
+
+async function confirmSourceSelection() {
+    if(!selectedSourcePiece){showToast('Select a fabric','error');return;}
+    try {
+        const {data,error} = await database.from('fabric_pieces').select('*').eq('id',selectedSourcePiece).single();
+        if(error) throw error;
+        closeModal('modal-receive');
+        openSplitModal(data, currentProcess);
+    } catch(err){showToast('Error: '+err.message,'error');}
+}
+
+// ============================================
+// SPLIT & MOVE
+// ============================================
+function openSplitModal(sourceData, targetProcess) {
+    window.selectedSourceData = sourceData;
+    splitTargetProcess = targetProcess;
+
+    document.getElementById('split-source-info').innerHTML = `
+        <strong>${sourceData.quality}</strong> | Grade: ${sourceData.grade} | Batch: ${sourceData.all_batch_numbers||sourceData.batch_number} | IB: ${sourceData.all_ib_numbers||sourceData.ib_number} | <strong>${sourceData.meters}m</strong> at ${PROCESS_NAMES[sourceData.current_process]}<br>
+        <span style="color:var(--secondary);">→ Moving to: ${PROCESS_NAMES[targetProcess]}</span>`;
+
+    document.getElementById('split-count').value = '1';
+    renderSplitPieces();
+    document.getElementById('modal-split').classList.add('active');
+}
+
+function renderSplitPieces() {
+    const count = parseInt(document.getElementById('split-count').value);
+    const container = document.getElementById('split-pieces-container');
+    const source = window.selectedSourceData;
+    const target = splitTargetProcess;
+    const cfg = PROCESS_CONFIG[target];
+    container.innerHTML = '';
+
+    for(let i=1;i<=count;i++){
+        const isOnly = count===1;
+        const div = document.createElement('div');
+        div.className = 'split-piece';
+
+        let header = `<span>Piece ${i} of ${count}</span>`;
+        if(!isOnly) header += `<label class="checkbox-group" style="margin:0;"><input type="checkbox" id="piece-${i}-move" checked onchange="togglePieceForm(${i})"> <span>Move to <strong>${PROCESS_NAMES[target]}</strong></span></label>`;
+        else header += `<span style="color:var(--success);">✓ Will move to ${PROCESS_NAMES[target]}</span>`;
+
+        let form = buildSplitPieceForm(i, source, target, isOnly);
+        let stayMsg = (!isOnly) ? `<div id="piece-${i}-stay-msg" class="hidden" style="padding:1rem;background:#f0fff4;border-radius:6px;color:#22543d;text-align:center;">✓ This piece will <strong>stay</strong> at ${PROCESS_NAMES[source.current_process]}</div>` : '';
+
+        div.innerHTML = `<div class="split-piece-header">${header}</div><div id="piece-${i}-form" class="form-grid">${form}</div>${stayMsg}`;
+        container.appendChild(div);
+
+        // Populate dropdowns after insertion
+        if(cfg.hasProcessType) populateProcessTypeDropdown(`piece-${i}`, target);
+        populateGradeDropdown(`piece-${i}-grade`, source.grade);
+    }
+}
+
+function buildSplitPieceForm(index, source, target, isOnly) {
+    const cfg = PROCESS_CONFIG[target];
+    const defaultMeters = isOnly ? source.meters : '';
+    let html = '';
+
+    html += `<div class="form-group"><label class="required">Meters</label><input type="number" id="piece-${index}-meters" value="${defaultMeters}" step="0.01" placeholder="Enter meters"><span class="hint">Machine reading may differ</span></div>`;
+    html += `<div class="form-group"><label class="required">Process Date</label><input type="date" id="piece-${index}-date" value="${new Date().toISOString().split('T')[0]}"></div>`;
+    html += `<div class="form-group"><label>Quality <span style="color:var(--success);">(Inherited)</span></label><input type="text" id="piece-${index}-quality" value="${source.quality}"></div>`;
+    html += `<div class="form-group"><label>Grade <span style="color:var(--success);">(Inherited)</span></label><select id="piece-${index}-grade"><option value="">Loading...</option></select></div>`;
+    html += `<div class="form-group"><label>Batch <span style="color:var(--success);">(Inherited)</span></label><input type="text" id="piece-${index}-batch" value="${source.all_batch_numbers||source.batch_number}"></div>`;
+    html += `<div class="form-group"><label>IB <span style="color:var(--success);">(Inherited)</span></label><input type="text" id="piece-${index}-ib" value="${source.all_ib_numbers||source.ib_number}"></div>`;
+
+    if(cfg.hasLot) html += `<div class="form-group"><label>Lot Number</label><input type="text" id="piece-${index}-lot" value="${source.lot_number||''}" placeholder="e.g. LOT-001"></div>`;
+    if(cfg.hasShade) {
+        html += `<div class="form-group"><label>Shade Number</label><input type="text" id="piece-${index}-shade_num" value="${source.shade_number||''}"></div>`;
+        html += `<div class="form-group"><label>Shade Name</label><input type="text" id="piece-${index}-shade_name" value="${source.shade_name||''}"></div>`;
+    }
+    if(cfg.hasDesign) {
+        html += `<div class="form-group"><label>Design Number</label><input type="text" id="piece-${index}-design" value="${source.design_number||''}"></div>`;
+        html += `<div class="form-group"><label>Colour Way</label><input type="text" id="piece-${index}-colour" value="${source.colour_way||''}"></div>`;
+    }
+    if(cfg.hasRfd) {
+        const checked = source.is_rfd ? 'checked' : '';
+        html += `<div class="form-group full"><label class="checkbox-group"><input type="checkbox" id="piece-${index}-rfd" ${checked}> <span style="font-weight:600;">This fabric is RFD (Ready for Dyeing)</span></label></div>`;
+    }
+    if(cfg.hasProcessType) html += `<div class="form-group full" id="piece-${index}-process-type-container"><label class="required">Process Type</label><select id="piece-${index}-process-type"><option value="">Loading...</option></select></div>`;
+    if(cfg.hasProcessName) html += `<div class="form-group full"><label class="required">Process Name</label><input type="text" id="piece-${index}-process-name" placeholder="e.g. Treatment A"></div>`;
+
+    html += `<div class="form-group full"><label>Remarks (Optional)</label><textarea id="piece-${index}-remarks" rows="1" placeholder="Notes..."></textarea></div>`;
+
+    return html;
+}
+
+function togglePieceForm(index) {
+    const shouldMove = document.getElementById(`piece-${index}-move`).checked;
+    const form = document.getElementById(`piece-${index}-form`);
+    const msg = document.getElementById(`piece-${index}-stay-msg`);
+    if(shouldMove){form.classList.remove('hidden');if(msg)msg.classList.add('hidden');}
+    else{form.classList.add('hidden');if(msg)msg.classList.remove('hidden');}
+}
+
+async function saveSplitMove() {
+    const btn = document.getElementById('btn-save-split');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+
+    try {
+        const count = parseInt(document.getElementById('split-count').value);
+        const source = window.selectedSourceData;
+        const target = splitTargetProcess;
+        const pieces = [];
+
+        for(let i=1;i<=count;i++){
+            const shouldMove = count===1 || document.getElementById(`piece-${i}-move`).checked;
+
+            if(shouldMove){
+                const meters = parseFloat(document.getElementById(`piece-${i}-meters`).value);
+                const date = document.getElementById(`piece-${i}-date`).value;
+                if(!meters || !date) throw new Error(`Piece ${i}: Fill meters and date`);
+
+                let payload = {
+                    quality: document.getElementById(`piece-${i}-quality`).value.trim() || source.quality,
+                    grade: document.getElementById(`piece-${i}-grade`).value.trim() || source.grade,
+                    batch_number: document.getElementById(`piece-${i}-batch`).value.trim() || source.batch_number,
+                    ib_number: document.getElementById(`piece-${i}-ib`).value.trim() || source.ib_number,
+                    all_batch_numbers: source.all_batch_numbers || source.batch_number,
+                    all_ib_numbers: source.all_ib_numbers || source.ib_number,
+                    meters, process_date: date,
+                    remarks: document.getElementById(`piece-${i}-remarks`).value.trim(),
+                    current_process: target, previous_process: source.current_process,
+                    status: 'in_stock', original_meters: meters,
+                    parent_id: source.id, root_id: source.root_id || source.id,
+                    split_from: source.id, split_index: i, split_total: count,
+                    source_piece_id: source.id
+                };
+
+                const cfg = PROCESS_CONFIG[target];
+                if(cfg.hasLot) payload.lot_number = document.getElementById(`piece-${i}-lot`).value.trim() || source.lot_number || null;
+                if(cfg.hasShade) {
+                    payload.shade_number = document.getElementById(`piece-${i}-shade_num`).value.trim() || source.shade_number || null;
+                    payload.shade_name = document.getElementById(`piece-${i}-shade_name`).value.trim() || source.shade_name || null;
+                }
+                if(cfg.hasDesign) {
+                    payload.design_number = document.getElementById(`piece-${i}-design`).value.trim() || source.design_number || null;
+                    payload.colour_way = document.getElementById(`piece-${i}-colour`).value.trim() || source.colour_way || null;
+                }
+                if(cfg.hasRfd) payload.is_rfd = document.getElementById(`piece-${i}-rfd`).checked;
+
+                let pconfig = {};
+                if(cfg.hasProcessType) {
+                    const pt = document.getElementById(`piece-${i}-process-type`);
+                    if(!pt || !pt.value) throw new Error(`Piece ${i}: Select process type`);
+                    pconfig.process_type = pt.value;
+                }
+                if(cfg.hasProcessName) {
+                    const pn = document.getElementById(`piece-${i}-process-name`);
+                    if(!pn || !pn.value.trim()) throw new Error(`Piece ${i}: Enter process name`);
+                    pconfig.process_name = pn.value.trim();
+                }
+                payload.process_config = pconfig;
+                pieces.push(payload);
+            } else {
+                // Stay behind - create child at original process
+                const metersInput = document.getElementById(`piece-${i}-meters`);
+                const meters = metersInput && metersInput.value ? parseFloat(metersInput.value) : source.meters;
+                pieces.push({
+                    quality: source.quality, grade: source.grade,
+                    batch_number: source.batch_number, ib_number: source.ib_number,
+                    all_batch_numbers: source.all_batch_numbers || source.batch_number,
+                    all_ib_numbers: source.all_ib_numbers || source.ib_number,
+                    meters, process_date: source.process_date,
+                    remarks: source.remarks, current_process: source.current_process,
+                    status: 'in_stock', process_config: source.process_config,
+                    parent_id: source.id, root_id: source.root_id || source.id,
+                    split_from: source.id, split_index: i, split_total: count,
+                    original_meters: meters, source_piece_id: source.id,
+                    lot_number: source.lot_number, shade_number: source.shade_number,
+                    shade_name: source.shade_name, design_number: source.design_number,
+                    colour_way: source.colour_way, is_rfd: source.is_rfd
+                });
+            }
+        }
+
+        // Mark source as split
+        const {error: updErr} = await database.from('fabric_pieces').update({status:'split',is_split:true}).eq('id',source.id);
+        if(updErr) throw updErr;
+
+        const {error: insErr} = await database.from('fabric_pieces').insert(pieces);
+        if(insErr) throw insErr;
+
+        showToast(`Created ${pieces.length} piece${pieces.length>1?'s':''}!`,'success');
+        closeModal('modal-split');
+        loadProcessStock(currentProcess);
+        refreshDashboard();
+    } catch(err) {
+        showToast(err.message,'error');
+        console.error(err);
+    } finally {
+        btn.innerHTML = 'Save & Move'; btn.disabled = false;
+    }
+}
+
+// ============================================
+// MERGE (COMBINE) FABRICS
+// ============================================
+function toggleMergeMode() {
+    mergeMode = !mergeMode;
+    mergeSelections = [];
+    document.getElementById('merge-toggle-btn').classList.toggle('hidden', mergeMode);
+    document.getElementById('merge-confirm-btn').classList.toggle('hidden', !mergeMode);
+    document.getElementById('merge-cancel-btn').classList.toggle('hidden', !mergeMode);
+    loadProcessStock(currentProcess);
+}
+
+function toggleMergeSelection(id) {
+    const idx = mergeSelections.indexOf(id);
+    if(idx > -1) mergeSelections.splice(idx, 1);
+    else mergeSelections.push(id);
+}
+
+async function openMergeModal() {
+    if(mergeSelections.length < 2) {
+        showToast('Select at least 2 fabrics to combine','error');
+        return;
+    }
+
+    try {
+        const {data,error} = await database.from('fabric_pieces').select('*').in('id',mergeSelections);
+        if(error) throw error;
+
+        let totalMeters = 0;
+        const batches = [], ibs = [];
+        let commonQuality = data[0].quality;
+        let commonGrade = data[0].grade;
+
+        data.forEach(d => {
+            totalMeters += d.meters;
+            batches.push(d.all_batch_numbers || d.batch_number);
+            ibs.push(d.all_ib_numbers || d.ib_number);
+        });
+
+        document.getElementById('merge-count').textContent = data.length;
+        document.getElementById('merge-source-info').innerHTML = data.map(d => `${d.quality} | ${d.batch_number} | ${d.meters}m`).join('<br>');
+        document.getElementById('merge-meters').value = totalMeters;
+        document.getElementById('merge-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('merge-quality').value = commonQuality;
+        // Grade dropdown populated below
+        document.getElementById('merge-all-batches').value = [...new Set(batches)].join(', ');
+        document.getElementById('merge-all-ibs').value = [...new Set(ibs)].join(', ');
+        document.getElementById('merge-remarks').value = '';
+
+        // Render process-specific config for merge
+        const cfg = PROCESS_CONFIG[currentProcess];
+        let configHtml = '';
+        if(cfg.hasProcessType) {
+            configHtml += `<div class="form-group full" id="merge-process-type-container"><label class="required">Process Type</label><select id="merge-process-type"><option value="">Loading...</option></select></div>`;
+        }
+        if(cfg.hasProcessName) {
+            configHtml += `<div class="form-group full"><label class="required">Process Name</label><input type="text" id="merge-process-name" placeholder="e.g. Treatment A"></div>`;
+        }
+        if(cfg.hasLot) {
+            configHtml += `<div class="form-group"><label>Lot Number</label><input type="text" id="merge-lot" placeholder="e.g. LOT-001"></div>`;
+        }
+        if(cfg.hasShade) {
+            configHtml += `<div class="form-group"><label>Shade Number</label><input type="text" id="merge-shade_num" placeholder="e.g. SH-001"></div>`;
+            configHtml += `<div class="form-group"><label>Shade Name</label><input type="text" id="merge-shade_name" placeholder="e.g. Navy Blue"></div>`;
+        }
+        if(cfg.hasDesign) {
+            configHtml += `<div class="form-group"><label>Design Number</label><input type="text" id="merge-design" placeholder="e.g. D-4521"></div>`;
+            configHtml += `<div class="form-group"><label>Colour Way</label><input type="text" id="merge-colour" placeholder="e.g. CW-A"></div>`;
+        }
+        if(cfg.hasRfd) {
+            configHtml += `<div class="form-group full"><label class="checkbox-group"><input type="checkbox" id="merge-rfd"> <span style="font-weight:600;">This fabric is RFD (Ready for Dyeing)</span></label></div>`;
+        }
+        document.getElementById('merge-config-container').innerHTML = configHtml;
+
+        if(cfg.hasProcessType) populateProcessTypeDropdown('merge', currentProcess);
+        populateGradeDropdown('merge-grade', commonGrade);
+
+        document.getElementById('modal-merge').classList.add('active');
+    } catch(err) {
+        showToast('Error: '+err.message,'error');
+    }
+}
+
+async function saveMerge() {
+    const btn = document.getElementById('btn-save-merge');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+
+    try {
+        const meters = parseFloat(document.getElementById('merge-meters').value);
+        const date = document.getElementById('merge-date').value;
+        const quality = document.getElementById('merge-quality').value.trim();
+        const grade = document.getElementById('merge-grade').value.trim();
+        const allBatches = document.getElementById('merge-all-batches').value;
+        const allIbs = document.getElementById('merge-all-ibs').value;
+        const remarks = document.getElementById('merge-remarks').value.trim();
+
+        if(!meters || !date || !quality || !grade) throw new Error('Fill all required fields');
+
+        const cfg = PROCESS_CONFIG[currentProcess];
+        let payload = {
+            quality, grade,
+            batch_number: mergeSelections[0], // Use first as primary
+            ib_number: mergeSelections[0],
+            all_batch_numbers: allBatches,
+            all_ib_numbers: allIbs,
+            meters, process_date: date, remarks,
+            current_process: currentProcess, status: 'in_stock',
+            original_meters: meters,
+            merge_sources: mergeSelections,
+            parent_id: mergeSelections[0]
+        };
+
+        if(cfg.hasLot) payload.lot_number = document.getElementById('merge-lot').value.trim() || null;
+        if(cfg.hasShade) {
+            payload.shade_number = document.getElementById('merge-shade_num').value.trim() || null;
+            payload.shade_name = document.getElementById('merge-shade_name').value.trim() || null;
+        }
+        if(cfg.hasDesign) {
+            payload.design_number = document.getElementById('merge-design').value.trim() || null;
+            payload.colour_way = document.getElementById('merge-colour').value.trim() || null;
+        }
+        if(cfg.hasRfd) payload.is_rfd = document.getElementById('merge-rfd').checked;
+
+        let pconfig = {};
+        if(cfg.hasProcessType) {
+            const pt = document.getElementById('merge-process-type');
+            if(!pt || !pt.value) throw new Error('Select process type');
+            pconfig.process_type = pt.value;
+        }
+        if(cfg.hasProcessName) {
+            const pn = document.getElementById('merge-process-name');
+            if(!pn || !pn.value.trim()) throw new Error('Enter process name');
+            pconfig.process_name = pn.value.trim();
+        }
+        payload.process_config = pconfig;
+
+        // Mark sources as merged
+        const {error: updErr} = await database.from('fabric_pieces').update({status:'merged'}).in('id',mergeSelections);
+        if(updErr) throw updErr;
+
+        const {error: insErr} = await database.from('fabric_pieces').insert([payload]);
+        if(insErr) throw insErr;
+
+        showToast('Fabrics combined successfully!','success');
+        closeModal('modal-merge');
+        toggleMergeMode();
+        loadProcessStock(currentProcess);
+        refreshDashboard();
+    } catch(err) {
+        showToast(err.message,'error');
+        console.error(err);
+    } finally {
+        btn.innerHTML = 'Combine & Save'; btn.disabled = false;
+    }
+}
+
+// ============================================
+// EDIT
+// ============================================
+async function openEditModal(id) {
+    try {
+        const {data,error} = await database.from('fabric_pieces').select('*').eq('id',id).single();
+        if(error) throw error;
+
+        document.getElementById('edit-id').value = data.id;
+        document.getElementById('edit-form-grid').innerHTML = buildFormFields('edit', data.current_process, data);
+        populateProcessTypeDropdown('edit', data.current_process, data.process_config?.process_type);
+        document.getElementById('modal-edit').classList.add('active');
+    } catch(err) { showToast('Error: '+err.message,'error'); }
+}
+
+async function saveEdit() {
+    const btn = document.getElementById('btn-save-edit');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+
+    try {
+        const id = document.getElementById('edit-id').value;
+        const {data:existing} = await database.from('fabric_pieces').select('current_process').eq('id',id).single();
+        const payload = collectFormData('edit', existing.current_process);
+        if(!payload) throw new Error('Fill all required fields');
+
+        const {error} = await database.from('fabric_pieces').update(payload).eq('id',id);
+        if(error) throw error;
+
+        showToast('Updated!','success');
+        closeModal('modal-edit');
+        loadProcessStock(currentProcess);
+        refreshDashboard();
+    } catch(err) {
+        showToast(err.message,'error');
+    } finally {
+        btn.innerHTML = 'Save Changes'; btn.disabled = false;
+    }
+}
+
+// ============================================
+// MOVE (Direct)
+// ============================================
+async function initiateMove(id) {
+    try {
+        const {data,error} = await database.from('fabric_pieces').select('*').eq('id',id).single();
+        if(error) throw error;
+
+        const available = PROCESS_ORDER.filter(p => p !== data.current_process);
+        if(!available.length){showToast('Final process, cannot move','error');return;}
+
+        const choices = available.map((p,i) => `${i+1}. ${PROCESS_NAMES[p]}`).join('\n');
+        const input = prompt(`Move to which process?\n\nCurrent: ${PROCESS_NAMES[data.current_process]}\n\nAvailable:\n${choices}\n\nEnter number (1-${available.length}):`,'1');
+        if(!input) return;
+
+        const choice = parseInt(input);
+        if(isNaN(choice) || choice<1 || choice>available.length){showToast('Invalid','error');return;}
+        openSplitModal(data, available[choice-1]);
+    } catch(err){showToast('Error: '+err.message,'error');}
+}
+
+// ============================================
+// RECENT ACTIVITIES
+// ============================================
+async function loadActivities() {
+    try {
+        let query = database.from('fabric_pieces').select('*').order('created_at',{ascending:false});
+
+        const search = document.getElementById('act-search').value.trim();
+        const proc = document.getElementById('act-process').value;
+        const stat = document.getElementById('act-status').value;
+        const fromDate = document.getElementById('act-from').value;
+        const toDate = document.getElementById('act-to').value;
+
+        if(search) {
+            query = query.or(`batch_number.ilike.%${search}%,ib_number.ilike.%${search}%,quality.ilike.%${search}%,lot_number.ilike.%${search}%,shade_number.ilike.%${search}%`);
+        }
+        if(proc) query = query.eq('current_process',proc);
+        if(stat) query = query.eq('status',stat);
+        if(fromDate) query = query.gte('process_date',fromDate);
+        if(toDate) query = query.lte('process_date',toDate);
+
+        const {data,error} = await query.limit(100);
+        if(error) throw error;
+
+        allActivities = data || [];
+        renderActivities(data || []);
+    } catch(err) { showToast('Error: '+err.message,'error'); }
+}
+
+function renderActivities(data) {
+    const tbody = document.getElementById('activities-table');
+    tbody.innerHTML = '';
+
+    if(!data.length){
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state">No activities found</td></tr>';
+        return;
+    }
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${formatDate(row.process_date)}</td>
+            <td><span class="badge badge-${row.current_process}">${PROCESS_NAMES[row.current_process]}</span></td>
+            <td>${row.quality}</td>
+            <td>${row.grade}</td>
+            <td>${row.all_batch_numbers||row.batch_number}</td>
+            <td>${row.all_ib_numbers||row.ib_number}</td>
+            <td>${row.lot_number||'-'}</td>
+            <td>${row.shade_number||'-'}</td>
+            <td><strong>${row.meters}m</strong></td>
+            <td>${row.status==='in_stock'?'✅ Stock':row.status==='split'?'📤 Forwarded':row.status==='merged'?'🔗 Merged':'📦 Moved'}</td>
+            <td class="actions">
+                    <button class="btn btn-sm btn-primary" onclick='openEditModal("${row.id}")'>Edit</button>
+                </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function clearActivityFilters() {
+    document.getElementById('act-search').value = '';
+    document.getElementById('act-process').value = '';
+    document.getElementById('act-status').value = '';
+    document.getElementById('act-from').value = '';
+    document.getElementById('act-to').value = '';
+    loadActivities();
+}
+
+// ============================================
+// FABRIC HISTORY
+// ============================================
+async function searchHistory() {
+    const batch = document.getElementById('hist-batch').value.trim();
+    const ib = document.getElementById('hist-ib').value.trim();
+    const lot = document.getElementById('hist-lot').value.trim();
+
+    if(!batch && !ib && !lot) {
+        showToast('Enter at least one search term','error');
+        return;
+    }
+
+    try {
+        let conditions = [];
+        if(batch) conditions.push(`batch_number.ilike.%${batch}%`);
+        if(ib) conditions.push(`ib_number.ilike.%${ib}%`);
+        if(lot) conditions.push(`lot_number.ilike.%${lot}%`);
+
+        // Also search in all_batch_numbers, all_ib_numbers
+        let query = database.from('fabric_pieces').select('*');
+        if(conditions.length === 1) {
+            query = query.or(conditions[0]);
+        } else {
+            query = query.or(conditions.join(','));
+        }
+
+        const {data,error} = await query.order('process_date',{ascending:true});
+        if(error) throw error;
+
+        renderHistory(data || []);
+    } catch(err) { showToast('Error: '+err.message,'error'); }
+}
+
+function renderHistory(data) {
+    const container = document.getElementById('history-results');
+    container.innerHTML = '';
+
+    if(!data.length){
+        container.innerHTML = '<div class="empty-state">No history found</div>';
+        return;
+    }
+
+    // Group by root/parent to show lineage
+    const roots = {};
+    data.forEach(d => {
+        const key = d.root_id || d.id;
+        if(!roots[key]) roots[key] = [];
+        roots[key].push(d);
+    });
+
+    Object.keys(roots).forEach(rootId => {
+        const pieces = roots[rootId].sort((a,b) => new Date(a.process_date) - new Date(b.process_date));
+        const first = pieces[0];
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'history-card';
+
+        // Header with common details
+        let headerHtml = `
+            <div class="history-header">
+                <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:1rem;">
+                    <div>
+                        <h3>${first.quality}</h3>
+                        <div style="opacity:0.9;font-size:0.9rem;">Batch: <strong>${first.all_batch_numbers||first.batch_number}</strong> | IB: <strong>${first.all_ib_numbers||first.ib_number}</strong></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:1.5rem;font-weight:bold;">${pieces.reduce((sum,p)=>sum+Number(p.meters||0),0).toLocaleString()}m</div>
+                        <div style="opacity:0.8;font-size:0.75rem;">Total across ${pieces.length} stage${pieces.length!==1?'s':''}</div>
+                    </div>
+                </div>
+                <div class="history-meta">
+                    <span>Grade: <strong>${first.grade}</strong></span>
+                    ${first.lot_number?`<span>Lot: <strong>${first.lot_number}</strong></span>`:''}
+                    ${first.shade_number?`<span>Shade: <strong>${first.shade_number}</strong> ${first.shade_name?`(${first.shade_name})`:''}</span>`:''}
+                    ${first.design_number?`<span>Design: <strong>${first.design_number}</strong> / ${first.colour_way||'-'}</span>`:''}
+                </div>
+            </div>
+        `;
+
+        // Timeline
+        let timelineHtml = '<div class="history-body">';
+        timelineHtml += '<div class="history-line"></div>';
+
+        pieces.forEach((p, idx) => {
+            const isLast = idx === pieces.length - 1;
+            const statusText = (p.status === 'split' || p.status === 'merged') ? '📤 Forwarded' : 
+                              p.status === 'in_stock' ? '✅ In Stock' : p.status;
+            const detail = getProcessDetailDisplay(p);
+            const stepClass = isLast ? 'history-step current' : 'history-step';
+
+            timelineHtml += `
+                <div class="${stepClass}">
+                    <div class="history-step-header">
+                        <div>
+                            <span class="badge badge-${p.current_process}" style="font-size:0.8rem;padding:0.35rem 0.75rem;">${PROCESS_NAMES[p.current_process]}</span>
+                            <span class="history-step-status">${statusText}</span>
+                        </div>
+                        <div class="history-step-date">${formatDate(p.process_date)}</div>
+                    </div>
+                    <div class="history-step-grid">
+                        <div><strong>${p.meters}m</strong> processed</div>
+                        ${p.lot_number?`<div>Lot: ${p.lot_number}</div>`:''}
+                        ${p.shade_number?`<div>Shade: ${p.shade_number}</div>`:''}
+                        ${p.shade_name?`<div>Shade Name: ${p.shade_name}</div>`:''}
+                        ${p.design_number?`<div>Design: ${p.design_number}</div>`:''}
+                        ${p.colour_way?`<div>Colour Way: ${p.colour_way}</div>`:''}
+                        ${detail!=='-'?`<div>Process: ${detail}</div>`:''}
+                        ${p.is_rfd?`<div style="color:var(--success);font-weight:600;">✓ RFD</div>`:''}
+                        ${p.remarks?`<div style="grid-column:1/-1;color:#718096;font-style:italic;margin-top:0.25rem;">"${p.remarks}"</div>`:''}
+                    </div>
+                </div>
+            `;
+        });
+
+        timelineHtml += '</div>';
+        groupDiv.innerHTML = headerHtml + timelineHtml;
+        container.appendChild(groupDiv);
+    });
+}
+
+function clearHistory() {
+    document.getElementById('hist-batch').value = '';
+    document.getElementById('hist-ib').value = '';
+    document.getElementById('hist-lot').value = '';
+    document.getElementById('history-results').innerHTML = '';
+}
+
+// ============================================
+// SETTINGS - DROPDOWN MANAGEMENT
+// ============================================
+async function loadSettings() {
+    const cat = document.getElementById('settings-category').value;
+    const tbody = document.getElementById('settings-table');
+    tbody.innerHTML = '';
+
+    if(!cat) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Select a category</td></tr>';
+        return;
+    }
+
+    try {
+        const {data,error} = await database.from('dropdown_options').select('*').eq('category',cat).order('sort_order');
+        if(error) throw error;
+
+        if(!data.length){
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No options in this category</td></tr>';
+            return;
+        }
+
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.value}</td>
+                <td><input type="text" id="set-label-${row.id}" value="${row.label}" style="width:100%;"></td>
+                <td><input type="number" id="set-order-${row.id}" value="${row.sort_order}" style="width:60px;"></td>
+                <td><input type="checkbox" id="set-active-${row.id}" ${row.is_active?'checked':''}></td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-success" onclick='updateSetting("${row.id}")'>Save</button>
+                    <button class="btn btn-sm btn-danger" onclick='deleteSetting("${row.id}")'>Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch(err) { showToast('Error: '+err.message,'error'); }
+}
+
+async function saveSetting() {
+    const cat = document.getElementById('settings-category').value;
+    const val = document.getElementById('set-value').value.trim();
+    const label = document.getElementById('set-label').value.trim();
+    const order = parseInt(document.getElementById('set-order').value) || 0;
+    const active = document.getElementById('set-active').value === 'true';
+
+    if(!cat || !val || !label) { showToast('Fill all fields','error'); return; }
+
+    try {
+        const {error} = await database.from('dropdown_options').insert([{category:cat,value:val,label:label,sort_order:order,is_active:active}]);
+        if(error) throw error;
+
+        showToast('Option added!','success');
+        document.getElementById('set-value').value = '';
+        document.getElementById('set-label').value = '';
+        loadSettings();
+        dropdownCache = {}; // Clear cache
+    } catch(err) { showToast(err.message,'error'); }
+}
+
+async function updateSetting(id) {
+    const label = document.getElementById('set-label-'+id).value.trim();
+    const order = parseInt(document.getElementById('set-order-'+id).value) || 0;
+    const active = document.getElementById('set-active-'+id).checked;
+
+    try {
+        const {error} = await database.from('dropdown_options').update({label:label,sort_order:order,is_active:active}).eq('id',id);
+        if(error) throw error;
+        showToast('Updated!','success');
+        dropdownCache = {};
+    } catch(err) { showToast(err.message,'error'); }
+}
+
+async function deleteSetting(id) {
+    if(!confirm('Delete this option?')) return;
+    try {
+        const {error} = await database.from('dropdown_options').delete().eq('id',id);
+        if(error) throw error;
+        showToast('Deleted!','success');
+        loadSettings();
+        dropdownCache = {};
+    } catch(err) { showToast(err.message,'error'); }
+}
+
+
+// ============================================
+// DELETE ENTRY
+// ============================================
+async function deleteEntry(id) {
+    if(!confirm('Are you sure you want to delete this entry? This cannot be undone.')) return;
+
+    try {
+        const {error} = await database.from('fabric_pieces').delete().eq('id', id);
+        if(error) throw error;
+
+        showToast('Entry deleted successfully', 'success');
+
+        // Refresh whatever view is currently open
+        if(!document.getElementById('dashboard-section').classList.contains('hidden')) {
+            refreshDashboard();
+        } else if(!document.getElementById('process-section').classList.contains('hidden')) {
+            loadProcessStock(currentProcess);
+        } else if(!document.getElementById('activities-section').classList.contains('hidden')) {
+            loadActivities();
+        }
+    } catch(err) {
+        showToast('Delete failed: ' + err.message, 'error');
+        console.error(err);
+    }
+}
+
+// ============================================
+// UTILITIES
+// ============================================
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function formatDate(dateStr) {
+    if(!dateStr) return '-';
+    const d = new Date(dateStr);
+    if(isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast toast-'+(type||'success')+' show';
+    setTimeout(()=>toast.classList.remove('show'),3000);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('active'); });
+});
+</script>
+</body>
+</html>
