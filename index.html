@@ -6,13 +6,13 @@
 <title>Textile ERP v2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f5f0e8;--card:#fffef9;--text:#2d2a26;--text-light:#6b6560;--primary:#1e3a5f;--secondary:#2c5282;--accent:#c17817;--success:#2d7d46;--danger:#b91c1c;--warning:#d97706;--border:#e8e2d9;--shadow-sm:0 1px 2px rgba(45,42,38,0.04),0 1px 3px rgba(45,42,38,0.06);--shadow:0 4px 6px -1px rgba(45,42,38,0.05),0 2px 4px -2px rgba(45,42,38,0.05),0 10px 15px -3px rgba(45,42,38,0.04);--shadow-lg:0 10px 15px -3px rgba(45,42,38,0.06),0 4px 6px -4px rgba(45,42,38,0.06),0 20px 25px -5px rgba(45,42,38,0.04);--shadow-hover:0 20px 25px -5px rgba(45,42,38,0.08),0 8px 10px -6px rgba(45,42,38,0.08),0 0 0 1px rgba(45,42,38,0.02);--pretreat:#3b82f6;--dyeing:#8b5cf6;--finish:#10b981;--radius-sm:12px;--radius:20px;--radius-lg:24px;--radius-xl:28px}
+:root{--bg:#f5f3ee;--card:#fffefc;--text:#0f172a;--text-light:#64748b;--primary:#0f172a;--secondary:#1e293b;--accent:#b45309;--success:#1e4d2b;--danger:#7f1d1d;--warning:#92400e;--border:#e2ddd3;--shadow-sm:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.06);--shadow:0 4px 6px -1px rgba(15,23,42,0.05),0 2px 4px -2px rgba(15,23,42,0.05),0 10px 15px -3px rgba(15,23,42,0.04);--shadow-lg:0 10px 15px -3px rgba(15,23,42,0.06),0 4px 6px -4px rgba(15,23,42,0.06),0 20px 25px -5px rgba(15,23,42,0.04);--shadow-hover:0 20px 25px -5px rgba(15,23,42,0.08),0 8px 10px -6px rgba(15,23,42,0.08),0 0 0 1px rgba(15,23,42,0.02);--pretreat:#1d4ed8;--dyeing:#6d28d9;--finish:#047857;--radius-sm:12px;--radius:20px;--radius-lg:24px;--radius-xl:28px}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
 
 /* NAVIGATION */
-nav{background:linear-gradient(180deg,#1e3a5f 0%,#254a75 100%);color:#fff;padding:1rem 2rem;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-lg)}
+nav{background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%);color:#fff;padding:1rem 2rem;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-lg)}
 .nav-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
 .logo{font-size:1.35rem;font-weight:700;letter-spacing:-0.5px;white-space:nowrap;color:#fff}
 .nav-processes{display:flex;gap:0.5rem;flex-wrap:wrap;overflow-x:auto;padding:0.25rem}
@@ -24,19 +24,19 @@ nav{background:linear-gradient(180deg,#1e3a5f 0%,#254a75 100%);color:#fff;paddin
 /* BENTO DASHBOARD */
 .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-bottom:3rem}
 .stat-card{background:var(--card);border-radius:var(--radius-xl);padding:2rem;box-shadow:var(--shadow);cursor:pointer;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);border:none;position:relative;overflow:hidden}
-.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--secondary),var(--accent));opacity:0.7;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
+.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1e293b,#d4af37);opacity:0.7;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
 .stat-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:var(--shadow-hover)}
 .stat-card h3{color:var(--text-light);font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.75rem;font-weight:600}
 .stat-card .value{font-size:2.25rem;font-weight:700;color:var(--primary);letter-spacing:-1px}
 .stat-card .sub{color:var(--text-light);font-size:0.85rem;margin-top:0.5rem;font-weight:500}
-.stat-card.total{grid-column:1/-1;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:#fff}
-.stat-card.total::before{background:linear-gradient(90deg,#fff,rgba(255,255,255,0.5))}
+.stat-card.total{grid-column:1/-1;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#334155 100%);color:#fff}
+.stat-card.total::before{background:linear-gradient(90deg,#d4af37,rgba(212,175,55,0.4))}
 .stat-card.total h3{color:rgba(255,255,255,0.7)}
 .stat-card.total .value{color:#fff}
 .stat-card.total .sub{color:rgba(255,255,255,0.8)}
-.stat-card.pretreat::before{background:linear-gradient(90deg,var(--pretreat),#60a5fa)}
-.stat-card.dyeing::before{background:linear-gradient(90deg,var(--dyeing),#a78bfa)}
-.stat-card.finish::before{background:linear-gradient(90deg,var(--finish),#34d399)}
+.stat-card.pretreat::before{background:linear-gradient(90deg,#1d4ed8,#93c5fd)}
+.stat-card.dyeing::before{background:linear-gradient(90deg,#6d28d9,#c4b5fd)}
+.stat-card.finish::before{background:linear-gradient(90deg,#047857,#6ee7b7)}
 
 /* SECTIONS & CARDS */
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
@@ -60,15 +60,15 @@ nav{background:linear-gradient(180deg,#1e3a5f 0%,#254a75 100%);color:#fff;paddin
 .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none !important}
 
 /* TABLES */
-.table-container{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow-x:auto;border:1px solid var(--border)}
+.table-container{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow-x:auto;border:1.5px solid #e2ddd3}
 table{width:100%;border-collapse:separate;border-spacing:0;min-width:900px}
-th{background:#faf8f5;padding:1rem 1.25rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+th{background:#f8f6f1;padding:1rem 1.25rem;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
 td{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.85rem;vertical-align:middle;color:var(--text)}
-tr:hover td{background:#faf8f5}
+tr:hover td{background:#f8f6f1}
 tr:last-child td{border-bottom:none}
 .badge{display:inline-block;padding:0.35rem 0.85rem;border-radius:9999px;font-size:0.7rem;font-weight:600;white-space:nowrap;box-shadow:var(--shadow-sm)}
 .badge-brushing{background:#dbeafe;color:#1e40af}
-.badge-singeing_desizing{background:#fef3c7;color:#92400e}
+.badge-singeing_desizing{background:#f0ebe3;color:#92400e}
 .badge-cbr{background:#ede9fe;color:#5b21b6}
 .badge-mercerising{background:#d1fae5;color:#065f46}
 .badge-pad_dry{background:#fee2e2;color:#991b1b}
@@ -79,7 +79,7 @@ tr:last-child td{border-bottom:none}
 .badge-washing{background:#d1fae5;color:#064e3b}
 .badge-sanforiser{background:#fce7f3;color:#831843}
 .badge-printing{background:#e0e7ff;color:#3730a3}
-.badge-loop_steamer{background:#fef3c7;color:#78350f}
+.badge-loop_steamer{background:#f0ebe3;color:#78350f}
 .badge-split{background:#fee2e2;color:#991b1b}
 .badge-merged{background:#ede9fe;color:#5b21b6}
 .actions{display:flex;gap:0.5rem;flex-wrap:wrap}
@@ -89,12 +89,12 @@ tr:last-child td{border-bottom:none}
 .modal-overlay.active{display:flex}
 .modal{background:var(--card);border-radius:var(--radius-xl);width:100%;max-width:750px;max-height:92vh;overflow-y:auto;box-shadow:0 25px 50px -12px rgba(45,42,38,0.15);border:1px solid var(--border)}
 .modal.wide{max-width:1000px}
-.modal-header{padding:1.75rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#faf8f5;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
+.modal-header{padding:1.75rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#f8f6f1;border-radius:var(--radius-xl) var(--radius-xl) 0 0}
 .modal-header h3{font-size:1.25rem;color:var(--primary);font-weight:700}
 .modal-close{background:none;border:none;font-size:1.75rem;cursor:pointer;color:var(--text-light);transition:all 0.2s;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .modal-close:hover{background:#f0ebe3;color:var(--danger);transform:rotate(90deg)}
 .modal-body{padding:2rem}
-.modal-footer{padding:1.25rem 2rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.75rem;background:#faf8f5;border-radius:0 0 var(--radius-xl) var(--radius-xl)}
+.modal-footer{padding:1.25rem 2rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.75rem;background:#f8f6f1;border-radius:0 0 var(--radius-xl) var(--radius-xl)}
 
 /* FORMS */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
@@ -103,33 +103,33 @@ tr:last-child td{border-bottom:none}
 label{font-size:0.8rem;font-weight:600;color:var(--text-light);letter-spacing:0.3px}
 input,select,textarea{padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;font-family:inherit;transition:all 0.25s ease;background:#fff;box-shadow:inset 0 1px 2px rgba(45,42,38,0.04)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--secondary);box-shadow:0 0 0 4px rgba(44,82,130,0.08),inset 0 1px 2px rgba(45,42,38,0.04)}
-input:hover,select:hover,textarea:hover{border-color:#d4cdc3}
+input:hover,select:hover,textarea:hover{border-color:#d4af37}
 .hint{font-size:0.75rem;color:var(--text-light);margin-top:0.2rem}
 .required::after{content:" *";color:var(--danger)}
 
 /* SPLIT PIECES */
-.split-piece{background:#faf8f5;border:1.5px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow-sm);transition:all 0.3s ease}
-.split-piece:hover{box-shadow:var(--shadow);border-color:#d4cdc3}
+.split-piece{background:#f8f6f1;border:1.5px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow-sm);transition:all 0.3s ease}
+.split-piece:hover{box-shadow:var(--shadow);border-color:#d4af37}
 .split-piece-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-weight:600;color:var(--primary);flex-wrap:wrap;gap:0.75rem;font-size:0.95rem}
 .checkbox-group{display:flex;align-items:center;gap:0.5rem}
 .checkbox-group input[type="checkbox"]{width:1.2rem;height:1.2rem;cursor:pointer;accent-color:var(--secondary)}
 
 /* SOURCE SELECTOR */
-.source-selector{background:#faf8f5;border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-sm)}
-.source-selector:hover{border-color:var(--secondary);background:#f0f7ff;transform:translateY(-2px);box-shadow:var(--shadow)}
+.source-selector{background:#f8f6f1;border:2px dashed var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-sm)}
+.source-selector:hover{border-color:#78350f;background:#f8f6f1;transform:translateY(-2px);box-shadow:var(--shadow)}
 .source-selector.selected{border-style:solid;border-color:var(--success);background:#f0fdf4;box-shadow:0 0 0 3px rgba(45,125,70,0.1)}
 
 /* EMPTY STATE */
 .empty-state{text-align:center;padding:3rem;color:var(--text-light);font-size:0.95rem}
 
 /* FILTER BAR */
-.filter-bar{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:end;background:var(--card);padding:1.5rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.filter-bar{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:end;background:#f8f6f1;padding:1.5rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1.5px solid #e2ddd3}
 .filter-bar .form-group{margin:0}
 .filter-bar input,.filter-bar select{min-width:160px}
 
 /* HISTORY */
 .history-timeline{position:relative;padding-left:2rem}
-.history-timeline::before{content:"";position:absolute;left:0.75rem;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--border),var(--secondary))}
+.history-timeline::before{content:"";position:absolute;left:0.75rem;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#e2ddd3,#1e293b)}
 .history-item{position:relative;margin-bottom:1.25rem;padding:1.25rem;background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);transition:all 0.3s ease}
 .history-item:hover{box-shadow:var(--shadow);transform:translateX(4px)}
 .history-item::before{content:"";position:absolute;left:-1.5rem;top:1.5rem;width:12px;height:12px;border-radius:50%;background:var(--secondary);border:3px solid var(--card);box-shadow:0 0 0 2px var(--border)}
@@ -138,15 +138,15 @@ input:hover,select:hover,textarea:hover{border-color:#d4cdc3}
 
 /* HISTORY CARD (new) */
 .history-card{background:var(--card);border-radius:var(--radius-xl);margin-bottom:2rem;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);transition:all 0.4s ease}
-.history-card:hover{box-shadow:var(--shadow-hover)}
-.history-header{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:#fff;padding:1.75rem 2rem}
+.history-card:hover{box-shadow:var(--shadow-hover);border-color:#d4af37}
+.history-header{background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#334155 100%);color:#fff;padding:1.75rem 2rem}
 .history-header h3{font-size:1.35rem;margin-bottom:0.35rem;font-weight:700}
 .history-meta{display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;font-size:0.85rem;opacity:0.9}
 .history-meta strong{font-weight:600;color:#fff}
-.history-body{padding:2rem;position:relative}
-.history-line{position:absolute;left:1rem;top:2rem;bottom:2rem;width:3px;background:linear-gradient(to bottom,var(--border),var(--secondary),var(--border));border-radius:3px}
-.history-step{position:relative;margin-bottom:1.5rem;padding:1.25rem;background:#faf8f5;border-radius:var(--radius);border:1.5px solid var(--border);margin-left:2rem;transition:all 0.3s ease}
-.history-step:hover{border-color:#d4cdc3;box-shadow:var(--shadow-sm)}
+.history-body{padding:2rem;position:relative;background:var(--card)}
+.history-line{position:absolute;left:1rem;top:2rem;bottom:2rem;width:3px;background:linear-gradient(to bottom,#e2ddd3,#1e293b,#e2ddd3);border-radius:3px}
+.history-step{position:relative;margin-bottom:1.5rem;padding:1.25rem;background:#f8f6f1;border-radius:var(--radius);border:1.5px solid var(--border);margin-left:2rem;transition:all 0.3s ease}
+.history-step:hover{border-color:#d4af37;box-shadow:var(--shadow-sm)}
 .history-step::before{content:"";position:absolute;left:-2.35rem;top:1.35rem;width:14px;height:14px;border-radius:50%;background:var(--secondary);border:3px solid var(--card);box-shadow:0 0 0 3px rgba(44,82,130,0.15)}
 .history-step.current::before{background:var(--success);box-shadow:0 0 0 3px rgba(45,125,70,0.2)}
 .history-step-header{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem}
@@ -187,6 +187,7 @@ table{min-width:700px}
 }
 </style>
 <base target="_blank">
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -215,6 +216,9 @@ table{min-width:700px}
 <button onclick="showSection('activities')" id="nav-activities">📋 Recent Activities</button>
 <button onclick="showSection('history')" id="nav-history">🔍 Fabric History</button>
 <button onclick="showSection('settings')" id="nav-settings">⚙️ Settings</button>
+<button onclick="showSection('machines')" id="nav-machines">🛠️ Machines</button>
+<button onclick="showSection('roles')" id="nav-roles">🎭 Roles</button>
+<button onclick="showSection('users')" id="nav-users">👤 Users</button>
 </div>
 </nav>
 
@@ -294,6 +298,56 @@ table{min-width:700px}
 
 </div>
 
+<!-- MACHINES MASTER -->
+<section id="machines-section" class="hidden">
+<div class="section-header"><h2>Machine Master</h2>
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+<button class="btn btn-secondary" onclick="downloadMachineTemplate()">📥 Download Template</button>
+<button class="btn btn-secondary" onclick="document.getElementById('machine-upload').click()">📤 Upload Excel</button>
+<input type="file" id="machine-upload" class="hidden" accept=".xlsx,.xls,.csv" onchange="uploadMachines(this)">
+<button class="btn btn-success" onclick="openMachineModal()">➕ Add Machine</button>
+</div></div>
+<div class="filter-bar">
+<div class="form-group"><label>Search</label><input type="text" id="machine-search" placeholder="Code, Name..." oninput="loadMachines()"></div>
+<div class="form-group"><label>Process</label><select id="machine-filter-process" onchange="loadMachines()"><option value="">All Processes</option></select></div>
+<div class="form-group"><label>Status</label><select id="machine-filter-status" onchange="loadMachines()"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+</div>
+<div class="table-container"><table><thead><tr><th>Machine Code</th><th>Name</th><th>Process</th><th>Capacity</th><th>Status</th><th>Location</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="machines-table"></tbody></table></div>
+</section>
+
+<!-- ROLES MASTER -->
+<section id="roles-section" class="hidden">
+<div class="section-header"><h2>Role Master</h2>
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+<button class="btn btn-secondary" onclick="downloadRoleTemplate()">📥 Download Template</button>
+<button class="btn btn-secondary" onclick="document.getElementById('role-upload').click()">📤 Upload Excel</button>
+<input type="file" id="role-upload" class="hidden" accept=".xlsx,.xls,.csv" onchange="uploadRoles(this)">
+<button class="btn btn-success" onclick="openRoleModal()">➕ Add Role</button>
+</div></div>
+<div class="filter-bar">
+<div class="form-group"><label>Search</label><input type="text" id="role-search" placeholder="Code, Name..." oninput="loadRoles()"></div>
+<div class="form-group"><label>Status</label><select id="role-filter-status" onchange="loadRoles()"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+</div>
+<div class="table-container"><table><thead><tr><th>Role Code</th><th>Name</th><th>Description</th><th>Permissions</th><th>Status</th><th>Actions</th></tr></thead><tbody id="roles-table"></tbody></table></div>
+</section>
+
+<!-- USERS & PERMISSIONS -->
+<section id="users-section" class="hidden">
+<div class="section-header"><h2>Users & Permissions</h2>
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+<button class="btn btn-secondary" onclick="downloadUserTemplate()">📥 Download Template</button>
+<button class="btn btn-secondary" onclick="document.getElementById('user-upload').click()">📤 Upload Excel</button>
+<input type="file" id="user-upload" class="hidden" accept=".xlsx,.xls,.csv" onchange="uploadUsers(this)">
+<button class="btn btn-success" onclick="openUserModal()">➕ Add User</button>
+</div></div>
+<div class="filter-bar">
+<div class="form-group"><label>Search</label><input type="text" id="user-search" placeholder="Name, Username, Email..." oninput="loadUsers()"></div>
+<div class="form-group"><label>Role</label><select id="user-filter-role" onchange="loadUsers()"><option value="">All Roles</option></select></div>
+<div class="form-group"><label>Status</label><select id="user-filter-status" onchange="loadUsers()"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+</div>
+<div class="table-container"><table><thead><tr><th>Full Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead><tbody id="users-table"></tbody></table></div>
+</section>
+
 <!-- ADD NEW MODAL -->
 <div class="modal-overlay" id="modal-add"><div class="modal">
 <div class="modal-header"><h3 id="add-modal-title">Add New</h3><button class="modal-close" onclick="closeModal('modal-add')">&times;</button></div>
@@ -355,7 +409,7 @@ table{min-width:700px}
 <div class="modal-overlay" id="modal-merge"><div class="modal">
 <div class="modal-header"><h3>Combine Fabrics into One</h3><button class="modal-close" onclick="closeModal('modal-merge')">&times;</button></div>
 <div class="modal-body">
-<div style="background:#fffbeb;border-left:4px solid var(--accent);padding:1rem;margin-bottom:1rem;border-radius:4px;">
+<div style="background:#f8f6f1;border-left:4px solid var(--accent);padding:1rem;margin-bottom:1rem;border-radius:4px;">
 <strong>Combining <span id="merge-count"></span> pieces</strong><br>
 <span id="merge-source-info" style="font-size:0.85rem;color:#718096;"></span>
 </div>
@@ -384,6 +438,50 @@ table{min-width:700px}
 <button class="btn btn-secondary" onclick="closeModal('modal-edit')">Cancel</button>
 <button class="btn btn-success" onclick="saveEdit()" id="btn-save-edit">Save Changes</button>
 </div>
+</div></div>
+
+<!-- MACHINE MODAL -->
+<div class="modal-overlay" id="modal-machine"><div class="modal">
+<div class="modal-header"><h3 id="machine-modal-title">Add Machine</h3><button class="modal-close" onclick="closeModal('modal-machine')">&times;</button></div>
+<div class="modal-body"><input type="hidden" id="machine-id"><div class="form-grid">
+<div class="form-group"><label class="required">Machine Code</label><input type="text" id="machine-code" placeholder="e.g. M-001"></div>
+<div class="form-group"><label class="required">Machine Name</label><input type="text" id="machine-name" placeholder="e.g. Brushing Machine 1"></div>
+<div class="form-group"><label class="required">Process</label><select id="machine-process"><option value="">-- Select Process --</option></select></div>
+<div class="form-group"><label>Capacity</label><input type="text" id="machine-capacity" placeholder="e.g. 5000m/day"></div>
+<div class="form-group"><label>Status</label><select id="machine-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+<div class="form-group"><label>Location</label><input type="text" id="machine-location" placeholder="e.g. Hall A"></div>
+<div class="form-group full"><label>Remarks</label><textarea id="machine-remarks" rows="2"></textarea></div>
+</div></div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-machine')">Cancel</button><button class="btn btn-success" onclick="saveMachine()" id="btn-save-machine">Save</button></div>
+</div></div>
+
+<!-- ROLE MODAL -->
+<div class="modal-overlay" id="modal-role"><div class="modal">
+<div class="modal-header"><h3 id="role-modal-title">Add Role</h3><button class="modal-close" onclick="closeModal('modal-role')">&times;</button></div>
+<div class="modal-body"><input type="hidden" id="role-id"><div class="form-grid">
+<div class="form-group"><label class="required">Role Code</label><input type="text" id="role-code" placeholder="e.g. ADMIN"></div>
+<div class="form-group"><label class="required">Role Name</label><input type="text" id="role-name" placeholder="e.g. Administrator"></div>
+<div class="form-group full"><label>Description</label><input type="text" id="role-desc" placeholder="e.g. Full system access"></div>
+<div class="form-group full"><label>Permissions <span class="hint">(Select processes this role can access)</span></label><div id="role-perms" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.5rem;"></div></div>
+<div class="form-group"><label>Status</label><select id="role-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+</div></div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-role')">Cancel</button><button class="btn btn-success" onclick="saveRole()" id="btn-save-role">Save</button></div>
+</div></div>
+
+<!-- USER MODAL -->
+<div class="modal-overlay" id="modal-user"><div class="modal">
+<div class="modal-header"><h3 id="user-modal-title">Add User</h3><button class="modal-close" onclick="closeModal('modal-user')">&times;</button></div>
+<div class="modal-body"><input type="hidden" id="user-id"><div class="form-grid">
+<div class="form-group"><label class="required">Full Name</label><input type="text" id="user-fullname" placeholder="e.g. John Doe"></div>
+<div class="form-group"><label class="required">Username</label><input type="text" id="user-username" placeholder="e.g. john.doe"></div>
+<div class="form-group"><label>Email</label><input type="email" id="user-email" placeholder="e.g. john@company.com"></div>
+<div class="form-group"><label>Phone</label><input type="text" id="user-phone" placeholder="e.g. +91 98765 43210"></div>
+<div class="form-group"><label class="required">Role</label><select id="user-role"><option value="">Loading...</option></select></div>
+<div class="form-group"><label>Department</label><input type="text" id="user-dept" placeholder="e.g. Production"></div>
+<div class="form-group"><label>Status</label><select id="user-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+<div class="form-group full"><label>Password <span class="hint">(Leave blank when editing to keep unchanged)</span></label><input type="password" id="user-password" placeholder="Set password"></div>
+</div></div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modal-user')">Cancel</button><button class="btn btn-success" onclick="saveUser()" id="btn-save-user">Save</button></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -484,7 +582,7 @@ function showSection(section) {
     const btn = document.getElementById('nav-'+navId);
     if(btn) btn.classList.add('active');
 
-    ['dashboard-section','process-section','activities-section','history-section','settings-section'].forEach(id => {
+    ['dashboard-section','process-section','activities-section','history-section','settings-section','machines-section','roles-section','users-section'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
 
@@ -499,6 +597,17 @@ function showSection(section) {
     }else if(section==='settings'){
         document.getElementById('settings-section').classList.remove('hidden');
         loadSettings();
+    }else if(section==='machines'){
+        document.getElementById('machines-section').classList.remove('hidden');
+        populateMachineProcessFilters();
+        loadMachines();
+    }else if(section==='roles'){
+        document.getElementById('roles-section').classList.remove('hidden');
+        loadRoles();
+    }else if(section==='users'){
+        document.getElementById('users-section').classList.remove('hidden');
+        populateUserRoleFilter();
+        loadUsers();
     }else{
         currentProcess = section;
         document.getElementById('process-section').classList.remove('hidden');
@@ -1728,6 +1837,551 @@ async function deleteEntry(id) {
         showToast('Delete failed: ' + err.message, 'error');
         console.error(err);
     }
+}
+
+// ============================================
+// MACHINES MASTER
+// ============================================
+function populateMachineProcessFilters() {
+    const sel = document.getElementById('machine-filter-process');
+    const modalSel = document.getElementById('machine-process');
+    if(sel) {
+        sel.innerHTML = '<option value="">All Processes</option>';
+        PROCESS_ORDER.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = PROCESS_NAMES[p];
+            sel.appendChild(opt);
+        });
+    }
+    if(modalSel) {
+        modalSel.innerHTML = '<option value="">-- Select Process --</option>';
+        PROCESS_ORDER.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = PROCESS_NAMES[p];
+            modalSel.appendChild(opt);
+        });
+    }
+}
+
+async function loadMachines() {
+    try {
+        let query = database.from('machines').select('*').order('machine_code');
+        const search = document.getElementById('machine-search').value.trim();
+        const proc = document.getElementById('machine-filter-process').value;
+        const stat = document.getElementById('machine-filter-status').value;
+        if(search) query = query.or(`machine_code.ilike.%${search}%,machine_name.ilike.%${search}%`);
+        if(proc) query = query.eq('process',proc);
+        if(stat) query = query.eq('status',stat);
+        const {data,error} = await query;
+        if(error) throw error;
+        const tbody = document.getElementById('machines-table');
+        tbody.innerHTML = '';
+        if(!data || !data.length){tbody.innerHTML='<tr><td colspan="8" class="empty-state">No machines found</td></tr>';return;}
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${row.machine_code}</strong></td>
+                <td>${row.machine_name}</td>
+                <td>${row.process ? PROCESS_NAMES[row.process] || row.process : '-'}</td>
+                <td>${row.capacity || '-'}</td>
+                <td><span class="badge" style="background:${row.status==='active'?'#d1fae5;color:#065f46':'#fee2e2;color:#991b1b'}">${row.status}</span></td>
+                <td>${row.location || '-'}</td>
+                <td>${row.remarks || '-'}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-primary" onclick='openMachineModal("${row.id}")'>✏️ Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick='deleteMachine("${row.id}")'>🗑️ Delete</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    } catch(err){showToast(err.message,'error');}
+}
+
+function openMachineModal(id) {
+    populateMachineProcessFilters();
+    const isEdit = !!id;
+    document.getElementById('machine-modal-title').textContent = isEdit ? 'Edit Machine' : 'Add Machine';
+    document.getElementById('machine-id').value = id || '';
+    document.getElementById('machine-code').value = '';
+    document.getElementById('machine-name').value = '';
+    document.getElementById('machine-process').value = '';
+    document.getElementById('machine-capacity').value = '';
+    document.getElementById('machine-status').value = 'active';
+    document.getElementById('machine-location').value = '';
+    document.getElementById('machine-remarks').value = '';
+    if(isEdit) {
+        database.from('machines').select('*').eq('id',id).single().then(({data,error}) => {
+            if(error) throw error;
+            document.getElementById('machine-code').value = data.machine_code;
+            document.getElementById('machine-name').value = data.machine_name;
+            document.getElementById('machine-process').value = data.process || '';
+            document.getElementById('machine-capacity').value = data.capacity || '';
+            document.getElementById('machine-status').value = data.status;
+            document.getElementById('machine-location').value = data.location || '';
+            document.getElementById('machine-remarks').value = data.remarks || '';
+        });
+    }
+    document.getElementById('modal-machine').classList.add('active');
+}
+
+async function saveMachine() {
+    const btn = document.getElementById('btn-save-machine');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+    try {
+        const id = document.getElementById('machine-id').value;
+        const payload = {
+            machine_code: document.getElementById('machine-code').value.trim(),
+            machine_name: document.getElementById('machine-name').value.trim(),
+            process: document.getElementById('machine-process').value || null,
+            capacity: document.getElementById('machine-capacity').value.trim() || null,
+            status: document.getElementById('machine-status').value,
+            location: document.getElementById('machine-location').value.trim() || null,
+            remarks: document.getElementById('machine-remarks').value.trim() || null
+        };
+        if(!payload.machine_code || !payload.machine_name) throw new Error('Machine Code and Name are required');
+        if(id) {
+            const {error} = await database.from('machines').update(payload).eq('id',id);
+            if(error) throw error;
+            showToast('Machine updated!','success');
+        } else {
+            const {error} = await database.from('machines').insert([payload]);
+            if(error) throw error;
+            showToast('Machine added!','success');
+        }
+        closeModal('modal-machine');
+        loadMachines();
+    } catch(err){showToast(err.message,'error');}
+    finally{btn.innerHTML='Save';btn.disabled=false;}
+}
+
+async function deleteMachine(id) {
+    if(!confirm('Delete this machine?')) return;
+    try {
+        const {error} = await database.from('machines').delete().eq('id',id);
+        if(error) throw error;
+        showToast('Deleted','success');
+        loadMachines();
+    } catch(err){showToast(err.message,'error');}
+}
+
+function downloadMachineTemplate() {
+    const ws = XLSX.utils.aoa_to_sheet([['Machine Code','Machine Name','Process','Capacity','Status','Location','Remarks']]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Machines');
+    XLSX.writeFile(wb, 'machine_master_template.xlsx');
+}
+
+async function uploadMachines(input) {
+    const file = input.files[0];
+    if(!file) return;
+    try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, {type:'array'});
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+        if(rows.length < 2) { showToast('File is empty','error'); return; }
+        const headers = rows[0].map(h => String(h).toLowerCase().trim());
+        const idx = {
+            code: headers.indexOf('machine code'),
+            name: headers.indexOf('machine name'),
+            process: headers.indexOf('process'),
+            capacity: headers.indexOf('capacity'),
+            status: headers.indexOf('status'),
+            location: headers.indexOf('location'),
+            remarks: headers.indexOf('remarks')
+        };
+        if(idx.code < 0 || idx.name < 0) { showToast('Required columns: Machine Code, Machine Name','error'); return; }
+
+        // Get existing codes
+        const {data:existing} = await database.from('machines').select('machine_code');
+        const existingCodes = new Set((existing||[]).map(e => e.machine_code.toLowerCase()));
+
+        let added = 0, skipped = 0;
+        const toInsert = [];
+        for(let i=1;i<rows.length;i++) {
+            const row = rows[i];
+            if(!row[idx.code]) continue;
+            const code = String(row[idx.code]).trim();
+            if(existingCodes.has(code.toLowerCase())) { skipped++; continue; }
+            toInsert.push({
+                machine_code: code,
+                machine_name: String(row[idx.name]||'').trim(),
+                process: row[idx.process] ? String(row[idx.process]).trim().toLowerCase().replace(/ /g,'_') : null,
+                capacity: row[idx.capacity] ? String(row[idx.capacity]).trim() : null,
+                status: (row[idx.status] && String(row[idx.status]).toLowerCase() === 'inactive') ? 'inactive' : 'active',
+                location: row[idx.location] ? String(row[idx.location]).trim() : null,
+                remarks: row[idx.remarks] ? String(row[idx.remarks]).trim() : null
+            });
+        }
+        if(toInsert.length) {
+            const {error} = await database.from('machines').insert(toInsert);
+            if(error) throw error;
+            added = toInsert.length;
+        }
+        showToast(`Added ${added}, Skipped ${skipped} duplicates`, added ? 'success' : 'error');
+        loadMachines();
+    } catch(err){showToast('Upload failed: '+err.message,'error');}
+    finally{input.value='';}
+}
+
+// ============================================
+// ROLES MASTER
+// ============================================
+function renderRolePermissions(selected) {
+    const container = document.getElementById('role-perms');
+    if(!container) return;
+    container.innerHTML = '';
+    const all = [['all','All Access (All Processes)'], ...PROCESS_ORDER.map(p => [p, PROCESS_NAMES[p]])];
+    const sel = selected || [];
+    all.forEach(([val,label]) => {
+        const id = 'perm-'+val;
+        const checked = sel.includes(val) ? 'checked' : '';
+        container.innerHTML += `<label class="checkbox-group" style="background:#faf8f3;padding:0.5rem 0.75rem;border-radius:var(--radius-sm);border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#d4af37'" onmouseout="this.style.borderColor='var(--border)'"><input type="checkbox" id="${id}" value="${val}" ${checked}> <span>${label}</span></label>`;
+    });
+}
+
+function getSelectedPermissions() {
+    const container = document.getElementById('role-perms');
+    if(!container) return [];
+    return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+}
+
+async function loadRoles() {
+    try {
+        let query = database.from('roles').select('*').order('role_code');
+        const search = document.getElementById('role-search').value.trim();
+        const stat = document.getElementById('role-filter-status').value;
+        if(search) query = query.or(`role_code.ilike.%${search}%,role_name.ilike.%${search}%`);
+        if(stat) query = query.eq('status',stat);
+        const {data,error} = await query;
+        if(error) throw error;
+        const tbody = document.getElementById('roles-table');
+        tbody.innerHTML = '';
+        if(!data || !data.length){tbody.innerHTML='<tr><td colspan="6" class="empty-state">No roles found</td></tr>';return;}
+        data.forEach(row => {
+            const perms = (row.permissions || []).map(p => p==='all' ? 'All' : (PROCESS_NAMES[p] || p)).join(', ');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${row.role_code}</strong></td>
+                <td>${row.role_name}</td>
+                <td>${row.description || '-'}</td>
+                <td>${perms || 'None'}</td>
+                <td><span class="badge" style="background:${row.status==='active'?'#d1fae5;color:#065f46':'#fee2e2;color:#991b1b'}">${row.status}</span></td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-primary" onclick='openRoleModal("${row.id}")'>✏️ Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick='deleteRole("${row.id}")'>🗑️ Delete</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    } catch(err){showToast(err.message,'error');}
+}
+
+function openRoleModal(id) {
+    const isEdit = !!id;
+    document.getElementById('role-modal-title').textContent = isEdit ? 'Edit Role' : 'Add Role';
+    document.getElementById('role-id').value = id || '';
+    document.getElementById('role-code').value = '';
+    document.getElementById('role-name').value = '';
+    document.getElementById('role-desc').value = '';
+    document.getElementById('role-status').value = 'active';
+    renderRolePermissions([]);
+    if(isEdit) {
+        database.from('roles').select('*').eq('id',id).single().then(({data,error}) => {
+            if(error) throw error;
+            document.getElementById('role-code').value = data.role_code;
+            document.getElementById('role-name').value = data.role_name;
+            document.getElementById('role-desc').value = data.description || '';
+            document.getElementById('role-status').value = data.status;
+            renderRolePermissions(data.permissions || []);
+        });
+    }
+    document.getElementById('modal-role').classList.add('active');
+}
+
+async function saveRole() {
+    const btn = document.getElementById('btn-save-role');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+    try {
+        const id = document.getElementById('role-id').value;
+        const payload = {
+            role_code: document.getElementById('role-code').value.trim(),
+            role_name: document.getElementById('role-name').value.trim(),
+            description: document.getElementById('role-desc').value.trim() || null,
+            permissions: getSelectedPermissions(),
+            status: document.getElementById('role-status').value
+        };
+        if(!payload.role_code || !payload.role_name) throw new Error('Role Code and Name are required');
+        if(id) {
+            const {error} = await database.from('roles').update(payload).eq('id',id);
+            if(error) throw error;
+            showToast('Role updated!','success');
+        } else {
+            const {error} = await database.from('roles').insert([payload]);
+            if(error) throw error;
+            showToast('Role added!','success');
+        }
+        closeModal('modal-role');
+        loadRoles();
+        populateUserRoleFilter();
+    } catch(err){showToast(err.message,'error');}
+    finally{btn.innerHTML='Save';btn.disabled=false;}
+}
+
+async function deleteRole(id) {
+    if(!confirm('Delete this role? Users assigned to it will lose their role.')) return;
+    try {
+        const {error} = await database.from('roles').delete().eq('id',id);
+        if(error) throw error;
+        showToast('Deleted','success');
+        loadRoles();
+        populateUserRoleFilter();
+    } catch(err){showToast(err.message,'error');}
+}
+
+function downloadRoleTemplate() {
+    const ws = XLSX.utils.aoa_to_sheet([['Role Code','Role Name','Description','Status']]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Roles');
+    XLSX.writeFile(wb, 'role_master_template.xlsx');
+}
+
+async function uploadRoles(input) {
+    const file = input.files[0];
+    if(!file) return;
+    try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, {type:'array'});
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+        if(rows.length < 2) { showToast('File is empty','error'); return; }
+        const headers = rows[0].map(h => String(h).toLowerCase().trim());
+        const idx = {
+            code: headers.indexOf('role code'),
+            name: headers.indexOf('role name'),
+            desc: headers.indexOf('description'),
+            status: headers.indexOf('status')
+        };
+        if(idx.code < 0 || idx.name < 0) { showToast('Required columns: Role Code, Role Name','error'); return; }
+
+        const {data:existing} = await database.from('roles').select('role_code');
+        const existingCodes = new Set((existing||[]).map(e => e.role_code.toLowerCase()));
+
+        let added = 0, skipped = 0;
+        const toInsert = [];
+        for(let i=1;i<rows.length;i++) {
+            const row = rows[i];
+            if(!row[idx.code]) continue;
+            const code = String(row[idx.code]).trim();
+            if(existingCodes.has(code.toLowerCase())) { skipped++; continue; }
+            toInsert.push({
+                role_code: code,
+                role_name: String(row[idx.name]||'').trim(),
+                description: row[idx.desc] ? String(row[idx.desc]).trim() : null,
+                status: (row[idx.status] && String(row[idx.status]).toLowerCase() === 'inactive') ? 'inactive' : 'active',
+                permissions: []
+            });
+        }
+        if(toInsert.length) {
+            const {error} = await database.from('roles').insert(toInsert);
+            if(error) throw error;
+            added = toInsert.length;
+        }
+        showToast(`Added ${added}, Skipped ${skipped} duplicates`, added ? 'success' : 'error');
+        loadRoles();
+        populateUserRoleFilter();
+    } catch(err){showToast('Upload failed: '+err.message,'error');}
+    finally{input.value='';}
+}
+
+// ============================================
+// USERS & PERMISSIONS
+// ============================================
+async function populateUserRoleFilter() {
+    const {data,error} = await database.from('roles').select('*').eq('status','active').order('role_name');
+    if(error) return;
+    const sel = document.getElementById('user-filter-role');
+    const modalSel = document.getElementById('user-role');
+    if(sel) {
+        sel.innerHTML = '<option value="">All Roles</option>';
+        (data||[]).forEach(r => { const opt=document.createElement('option');opt.value=r.id;opt.textContent=r.role_name;sel.appendChild(opt); });
+    }
+    if(modalSel) {
+        modalSel.innerHTML = '<option value="">-- Select Role --</option>';
+        (data||[]).forEach(r => { const opt=document.createElement('option');opt.value=r.id;opt.textContent=r.role_name;modalSel.appendChild(opt); });
+    }
+}
+
+async function loadUsers() {
+    try {
+        let query = database.from('users').select('*,roles(role_name)').order('full_name');
+        const search = document.getElementById('user-search').value.trim();
+        const role = document.getElementById('user-filter-role').value;
+        const stat = document.getElementById('user-filter-status').value;
+        if(search) query = query.or(`full_name.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`);
+        if(role) query = query.eq('role_id',role);
+        if(stat) query = query.eq('status',stat);
+        const {data,error} = await query;
+        if(error) throw error;
+        const tbody = document.getElementById('users-table');
+        tbody.innerHTML = '';
+        if(!data || !data.length){tbody.innerHTML='<tr><td colspan="8" class="empty-state">No users found</td></tr>';return;}
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${row.full_name}</strong></td>
+                <td>${row.username}</td>
+                <td>${row.email || '-'}</td>
+                <td>${row.phone || '-'}</td>
+                <td>${row.roles?.role_name || '-'}</td>
+                <td>${row.department || '-'}</td>
+                <td><span class="badge" style="background:${row.status==='active'?'#d1fae5;color:#065f46':'#fee2e2;color:#991b1b'}">${row.status}</span></td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-primary" onclick='openUserModal("${row.id}")'>✏️ Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick='deleteUser("${row.id}")'>🗑️ Delete</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    } catch(err){showToast(err.message,'error');}
+}
+
+function openUserModal(id) {
+    populateUserRoleFilter();
+    const isEdit = !!id;
+    document.getElementById('user-modal-title').textContent = isEdit ? 'Edit User' : 'Add User';
+    document.getElementById('user-id').value = id || '';
+    document.getElementById('user-fullname').value = '';
+    document.getElementById('user-username').value = '';
+    document.getElementById('user-email').value = '';
+    document.getElementById('user-phone').value = '';
+    document.getElementById('user-role').value = '';
+    document.getElementById('user-dept').value = '';
+    document.getElementById('user-status').value = 'active';
+    document.getElementById('user-password').value = '';
+    if(isEdit) {
+        database.from('users').select('*').eq('id',id).single().then(({data,error}) => {
+            if(error) throw error;
+            document.getElementById('user-fullname').value = data.full_name;
+            document.getElementById('user-username').value = data.username;
+            document.getElementById('user-email').value = data.email || '';
+            document.getElementById('user-phone').value = data.phone || '';
+            document.getElementById('user-role').value = data.role_id || '';
+            document.getElementById('user-dept').value = data.department || '';
+            document.getElementById('user-status').value = data.status;
+        });
+    }
+    document.getElementById('modal-user').classList.add('active');
+}
+
+async function saveUser() {
+    const btn = document.getElementById('btn-save-user');
+    btn.innerHTML = '<span class="loading"></span>'; btn.disabled = true;
+    try {
+        const id = document.getElementById('user-id').value;
+        const payload = {
+            full_name: document.getElementById('user-fullname').value.trim(),
+            username: document.getElementById('user-username').value.trim(),
+            email: document.getElementById('user-email').value.trim() || null,
+            phone: document.getElementById('user-phone').value.trim() || null,
+            role_id: document.getElementById('user-role').value || null,
+            department: document.getElementById('user-dept').value.trim() || null,
+            status: document.getElementById('user-status').value
+        };
+        if(!payload.full_name || !payload.username) throw new Error('Full Name and Username are required');
+        if(!id && !document.getElementById('user-password').value.trim()) throw new Error('Password is required for new users');
+
+        if(id) {
+            // Update - don't touch password if blank
+            const {error} = await database.from('users').update(payload).eq('id',id);
+            if(error) throw error;
+            showToast('User updated!','success');
+        } else {
+            payload.password_hash = document.getElementById('user-password').value.trim(); // plaintext for now, hash later
+            const {error} = await database.from('users').insert([payload]);
+            if(error) throw error;
+            showToast('User added!','success');
+        }
+        closeModal('modal-user');
+        loadUsers();
+    } catch(err){showToast(err.message,'error');}
+    finally{btn.innerHTML='Save';btn.disabled=false;}
+}
+
+async function deleteUser(id) {
+    if(!confirm('Delete this user?')) return;
+    try {
+        const {error} = await database.from('users').delete().eq('id',id);
+        if(error) throw error;
+        showToast('Deleted','success');
+        loadUsers();
+    } catch(err){showToast(err.message,'error');}
+}
+
+function downloadUserTemplate() {
+    const ws = XLSX.utils.aoa_to_sheet([['Full Name','Username','Email','Phone','Role Code','Department','Status']]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Users');
+    XLSX.writeFile(wb, 'users_template.xlsx');
+}
+
+async function uploadUsers(input) {
+    const file = input.files[0];
+    if(!file) return;
+    try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, {type:'array'});
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+        if(rows.length < 2) { showToast('File is empty','error'); return; }
+        const headers = rows[0].map(h => String(h).toLowerCase().trim());
+        const idx = {
+            name: headers.indexOf('full name'),
+            username: headers.indexOf('username'),
+            email: headers.indexOf('email'),
+            phone: headers.indexOf('phone'),
+            role: headers.indexOf('role code'),
+            dept: headers.indexOf('department'),
+            status: headers.indexOf('status')
+        };
+        if(idx.name < 0 || idx.username < 0) { showToast('Required columns: Full Name, Username','error'); return; }
+
+        // Get existing usernames and role mapping
+        const [{data:existingUsers},{data:roles}] = await Promise.all([
+            database.from('users').select('username'),
+            database.from('roles').select('id,role_code')
+        ]);
+        const existingNames = new Set((existingUsers||[]).map(e => e.username.toLowerCase()));
+        const roleMap = {};
+        (roles||[]).forEach(r => roleMap[r.role_code.toLowerCase()] = r.id);
+
+        let added = 0, skipped = 0;
+        const toInsert = [];
+        for(let i=1;i<rows.length;i++) {
+            const row = rows[i];
+            if(!row[idx.username]) continue;
+            const uname = String(row[idx.username]).trim();
+            if(existingNames.has(uname.toLowerCase())) { skipped++; continue; }
+            const roleCode = row[idx.role] ? String(row[idx.role]).trim().toLowerCase() : null;
+            toInsert.push({
+                full_name: String(row[idx.name]||'').trim(),
+                username: uname,
+                email: row[idx.email] ? String(row[idx.email]).trim() : null,
+                phone: row[idx.phone] ? String(row[idx.phone]).trim() : null,
+                role_id: roleCode && roleMap[roleCode] ? roleMap[roleCode] : null,
+                department: row[idx.dept] ? String(row[idx.dept]).trim() : null,
+                status: (row[idx.status] && String(row[idx.status]).toLowerCase() === 'inactive') ? 'inactive' : 'active',
+                password_hash: 'changeme123' // default password
+            });
+        }
+        if(toInsert.length) {
+            const {error} = await database.from('users').insert(toInsert);
+            if(error) throw error;
+            added = toInsert.length;
+        }
+        showToast(`Added ${added}, Skipped ${skipped} duplicates`, added ? 'success' : 'error');
+        loadUsers();
+    } catch(err){showToast('Upload failed: '+err.message,'error');}
+    finally{input.value='';}
 }
 
 // ============================================
